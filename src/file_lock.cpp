@@ -8,13 +8,12 @@ file_lock::impl::~impl() {
     }
 }
 
-file_lock::file_lock(const path& p, lock_options options)
-    : _impl(std::make_unique<impl>(p, options)) {}
+file_lock::file_lock(const path &p, lock_options options) : _impl(std::make_unique<impl>(p, options)) {}
 
 file_lock::~file_lock() = default;
 
-file_lock::file_lock(file_lock&& other) noexcept = default;
-file_lock& file_lock::operator=(file_lock&& other) noexcept = default;
+file_lock::file_lock(file_lock &&other) noexcept = default;
+file_lock &file_lock::operator=(file_lock &&other) noexcept = default;
 
 void_result file_lock::lock() {
     return _impl->lock();
@@ -40,7 +39,7 @@ file_lock::operator bool() const noexcept {
     return owns_lock();
 }
 
-const path& file_lock::file_path() const noexcept {
+const path &file_lock::file_path() const noexcept {
     return _impl->_file_path;
 }
 
@@ -52,8 +51,7 @@ lock_type file_lock::type() const noexcept {
 // scoped_file_lock implementation
 // ============================================================================
 
-scoped_file_lock::scoped_file_lock(const path& p, lock_type type)
-    : _lock(p, lock_options{.type = type}) {
+scoped_file_lock::scoped_file_lock(const path &p, lock_type type) : _lock(p, lock_options{.type = type}) {
     auto result = _lock.lock();
     _locked = result.has_value();
 }
@@ -76,7 +74,7 @@ scoped_file_lock::operator bool() const noexcept {
 // Convenience functions
 // ============================================================================
 
-result<file_lock> lock_file(const path& p, lock_options options) noexcept {
+result<file_lock> lock_file(const path &p, lock_options options) noexcept {
     try {
         file_lock lock(p, options);
         auto result = lock.lock();
@@ -89,7 +87,7 @@ result<file_lock> lock_file(const path& p, lock_options options) noexcept {
     }
 }
 
-result<bool> try_lock_file(const path& p, lock_type type) noexcept {
+result<bool> try_lock_file(const path &p, lock_type type) noexcept {
     try {
         file_lock lock(p, lock_options{.type = type, .mode = lock_mode::non_blocking});
         auto result = lock.try_lock();
@@ -105,7 +103,7 @@ result<bool> try_lock_file(const path& p, lock_type type) noexcept {
     }
 }
 
-result<bool> is_file_locked(const path& p) noexcept {
+result<bool> is_file_locked(const path &p) noexcept {
     auto result = try_lock_file(p, lock_type::exclusive);
     if (!result) {
         return std::unexpected(result.error());
@@ -115,9 +113,12 @@ result<bool> is_file_locked(const path& p) noexcept {
 
 std::string_view lock_type_name(lock_type type) noexcept {
     switch (type) {
-        case lock_type::shared: return "shared";
-        case lock_type::exclusive: return "exclusive";
-        default: return "unknown";
+    case lock_type::shared:
+        return "shared";
+    case lock_type::exclusive:
+        return "exclusive";
+    default:
+        return "unknown";
     }
 }
 

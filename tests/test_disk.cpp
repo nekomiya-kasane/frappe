@@ -1,14 +1,13 @@
-#include <gtest/gtest.h>
 #include "frappe/disk.hpp"
+
 #include <filesystem>
 #include <fstream>
+#include <gtest/gtest.h>
 
 class DiskTest : public ::testing::Test {
-protected:
-    void SetUp() override {
-        _test_path = std::filesystem::temp_directory_path();
-    }
-    
+  protected:
+    void SetUp() override { _test_path = std::filesystem::temp_directory_path(); }
+
     std::filesystem::path _test_path;
 };
 
@@ -62,8 +61,8 @@ TEST_F(DiskTest, ListDisks) {
     auto disks = frappe::list_disks();
     EXPECT_TRUE(disks.has_value());
     EXPECT_GT(disks->size(), 0u);
-    
-    for (const auto& disk : *disks) {
+
+    for (const auto &disk : *disks) {
         EXPECT_FALSE(disk.device_path.empty());
         EXPECT_GT(disk.size, 0u);
     }
@@ -80,7 +79,7 @@ TEST_F(DiskTest, GetDiskInfo) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
     ASSERT_GT(disks->size(), 0u);
-    
+
     auto info = frappe::get_disk_info(disks->front().device_path);
     EXPECT_TRUE(info.has_value());
     EXPECT_EQ(info->device_path, disks->front().device_path);
@@ -94,7 +93,7 @@ TEST_F(DiskTest, GetPartitionTable) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
     ASSERT_GT(disks->size(), 0u);
-    
+
     auto table = frappe::get_partition_table(disks->front().device_path);
     EXPECT_TRUE(table.has_value());
     EXPECT_FALSE(table->device_path.empty());
@@ -117,8 +116,8 @@ TEST_F(DiskTest, ListMountedPartitions) {
     EXPECT_TRUE(partitions.has_value());
     // Should have at least one mounted partition
     EXPECT_GT(partitions->size(), 0u);
-    
-    for (const auto& p : *partitions) {
+
+    for (const auto &p : *partitions) {
         EXPECT_FALSE(p.mount_point.empty());
     }
 }
@@ -162,7 +161,7 @@ TEST_F(DiskTest, GetFreeRegions) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
     ASSERT_GT(disks->size(), 0u);
-    
+
     auto regions = frappe::get_free_regions(disks->front().device_path);
     EXPECT_TRUE(regions.has_value());
     // May or may not have free regions
@@ -172,7 +171,7 @@ TEST_F(DiskTest, GetTotalFreeSpace) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
     ASSERT_GT(disks->size(), 0u);
-    
+
     auto free_space = frappe::get_total_free_space(disks->front().device_path);
     EXPECT_TRUE(free_space.has_value());
 }
@@ -184,13 +183,13 @@ TEST_F(DiskTest, GetTotalFreeSpace) {
 TEST_F(DiskTest, GetPartitionByLabel) {
     auto result = frappe::get_partition_by_label("NonExistentLabel12345");
     EXPECT_TRUE(result.has_value());
-    EXPECT_FALSE(result->has_value());  // Should be nullopt
+    EXPECT_FALSE(result->has_value()); // Should be nullopt
 }
 
 TEST_F(DiskTest, GetPartitionByUuid) {
     auto result = frappe::get_partition_by_uuid("00000000-0000-0000-0000-000000000000");
     EXPECT_TRUE(result.has_value());
-    EXPECT_FALSE(result->has_value());  // Should be nullopt
+    EXPECT_FALSE(result->has_value()); // Should be nullopt
 }
 
 // ============================================================================
@@ -201,8 +200,8 @@ TEST_F(DiskTest, ListMounts) {
     auto mounts = frappe::list_mounts();
     EXPECT_TRUE(mounts.has_value());
     EXPECT_GT(mounts->size(), 0u);
-    
-    for (const auto& m : *mounts) {
+
+    for (const auto &m : *mounts) {
         EXPECT_FALSE(m.mount_point.empty());
     }
 }
@@ -229,7 +228,7 @@ TEST_F(DiskTest, IsMounted) {
     auto mounts = frappe::list_mounts();
     ASSERT_TRUE(mounts.has_value());
     ASSERT_GT(mounts->size(), 0u);
-    
+
     // First mount should be mounted
     auto result = frappe::is_mounted(mounts->front().device);
     EXPECT_TRUE(result.has_value());
@@ -240,7 +239,7 @@ TEST_F(DiskTest, GetMountPoint) {
     auto mounts = frappe::list_mounts();
     ASSERT_TRUE(mounts.has_value());
     ASSERT_GT(mounts->size(), 0u);
-    
+
     auto mp = frappe::get_mount_point(mounts->front().device);
     EXPECT_TRUE(mp.has_value());
     EXPECT_EQ(*mp, mounts->front().mount_point);
@@ -250,7 +249,7 @@ TEST_F(DiskTest, GetDeviceByMountPoint) {
     auto mounts = frappe::list_mounts();
     ASSERT_TRUE(mounts.has_value());
     ASSERT_GT(mounts->size(), 0u);
-    
+
     auto device = frappe::get_device_by_mount_point(mounts->front().mount_point);
     EXPECT_TRUE(device.has_value());
     EXPECT_EQ(*device, mounts->front().device);
@@ -260,8 +259,8 @@ TEST_F(DiskTest, ListUnmountedPartitions) {
     auto partitions = frappe::list_unmounted_partitions();
     EXPECT_TRUE(partitions.has_value());
     // May or may not have unmounted partitions
-    
-    for (const auto& p : *partitions) {
+
+    for (const auto &p : *partitions) {
         EXPECT_TRUE(p.mount_point.empty());
     }
 }
@@ -285,8 +284,8 @@ TEST_F(DiskTest, GetSystemDisk) {
 TEST_F(DiskTest, ListPhysicalDisks) {
     auto disks = frappe::list_physical_disks();
     EXPECT_TRUE(disks.has_value());
-    
-    for (const auto& d : *disks) {
+
+    for (const auto &d : *disks) {
         EXPECT_NE(d.type, frappe::disk_type::virtual_disk);
         EXPECT_NE(d.type, frappe::disk_type::ram_disk);
     }
@@ -295,8 +294,8 @@ TEST_F(DiskTest, ListPhysicalDisks) {
 TEST_F(DiskTest, ListRemovableDisks) {
     auto disks = frappe::list_removable_disks();
     EXPECT_TRUE(disks.has_value());
-    
-    for (const auto& d : *disks) {
+
+    for (const auto &d : *disks) {
         EXPECT_TRUE(d.is_removable);
     }
 }
@@ -304,7 +303,7 @@ TEST_F(DiskTest, ListRemovableDisks) {
 TEST_F(DiskTest, GetDiskBySerial) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
-    
+
     if (!disks->empty() && !disks->front().serial.empty()) {
         auto disk = frappe::get_disk_by_serial(disks->front().serial);
         EXPECT_TRUE(disk.has_value());
@@ -328,7 +327,7 @@ TEST_F(DiskTest, SmartStatusName) {
 TEST_F(DiskTest, GetSmartInfo) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
-    
+
     if (!disks->empty()) {
         auto smart = frappe::get_smart_info(disks->front().device_path);
         // May or may not succeed depending on permissions
@@ -344,7 +343,7 @@ TEST_F(DiskTest, GetSmartInfo) {
 TEST_F(DiskTest, GetDiskHealth) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
-    
+
     if (!disks->empty()) {
         auto health = frappe::get_disk_health(disks->front().device_path);
         // May fail due to permissions, that's OK
@@ -358,13 +357,12 @@ TEST_F(DiskTest, GetDiskHealth) {
 TEST_F(DiskTest, IsNvmeDevice) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
-    
-    for (const auto& d : *disks) {
+
+    for (const auto &d : *disks) {
         auto is_nvme = frappe::is_nvme_device(d.device_path);
         if (is_nvme.has_value()) {
             if (*is_nvme) {
-                EXPECT_TRUE(d.type == frappe::disk_type::nvme || 
-                           d.bus_type == frappe::disk_bus_type::nvme);
+                EXPECT_TRUE(d.type == frappe::disk_type::nvme || d.bus_type == frappe::disk_bus_type::nvme);
             }
         }
     }
@@ -457,13 +455,13 @@ TEST_F(DiskTest, ListVirtualDiskFiles) {
     // Create a temp directory with a fake virtual disk file
     auto temp_dir = std::filesystem::temp_directory_path() / "frappe_vdisk_test";
     std::filesystem::create_directories(temp_dir);
-    
+
     auto fake_vhd = temp_dir / "test.vhd";
     std::ofstream(fake_vhd) << "fake vhd content";
-    
+
     auto files = frappe::list_virtual_disk_files(temp_dir);
     EXPECT_TRUE(files.has_value());
     EXPECT_EQ(files->size(), 1u);
-    
+
     std::filesystem::remove_all(temp_dir);
 }

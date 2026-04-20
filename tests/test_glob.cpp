@@ -1,17 +1,18 @@
-#include <gtest/gtest.h>
 #include "frappe/glob.hpp"
+
 #include <filesystem>
 #include <fstream>
+#include <gtest/gtest.h>
 
 class GlobTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         _test_dir = std::filesystem::temp_directory_path() / "frappe_glob_test";
         std::filesystem::create_directories(_test_dir);
         std::filesystem::create_directories(_test_dir / "subdir1");
         std::filesystem::create_directories(_test_dir / "subdir2");
         std::filesystem::create_directories(_test_dir / "subdir1" / "nested");
-        
+
         create_file(_test_dir / "file1.txt");
         create_file(_test_dir / "file2.txt");
         create_file(_test_dir / "file3.log");
@@ -20,16 +21,14 @@ protected:
         create_file(_test_dir / "subdir1" / "nested" / "deep.txt");
         create_file(_test_dir / "subdir2" / "sub3.txt");
     }
-    
+
     void TearDown() override {
         std::error_code ec;
         std::filesystem::remove_all(_test_dir, ec);
     }
-    
-    void create_file(const std::filesystem::path& p) {
-        std::ofstream(p).put('x');
-    }
-    
+
+    void create_file(const std::filesystem::path &p) { std::ofstream(p).put('x'); }
+
     std::filesystem::path _test_dir;
 };
 
@@ -89,7 +88,7 @@ TEST_F(GlobTest, GlobRecursive) {
 
 TEST_F(GlobTest, GlobIterator) {
     int count = 0;
-    for (const auto& p : frappe::iglob(_test_dir, "*.txt")) {
+    for (const auto &p : frappe::iglob(_test_dir, "*.txt")) {
         EXPECT_TRUE(p.extension() == ".txt");
         ++count;
     }

@@ -1,13 +1,14 @@
-#include <gtest/gtest.h>
 #include "frappe/watcher.hpp"
+
+#include <atomic>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <gtest/gtest.h>
 #include <thread>
-#include <chrono>
-#include <atomic>
 
 class WatcherTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         _test_dir = std::filesystem::temp_directory_path() / "frappe_watcher_test";
         std::filesystem::create_directories(_test_dir);
@@ -74,7 +75,7 @@ TEST_F(WatcherTest, AddMultiplePaths) {
     std::filesystem::create_directories(subdir2);
 
     frappe::file_watcher watcher;
-    std::vector<frappe::path> paths = { subdir1, subdir2 };
+    std::vector<frappe::path> paths = {subdir1, subdir2};
     auto result = watcher.add(paths);
     EXPECT_TRUE(result.has_value());
 
@@ -132,15 +133,15 @@ TEST_F(WatcherTest, StartWithoutPaths) {
 // ============================================================================
 
 TEST_F(WatcherTest, DetectFileCreation) {
-    std::atomic<bool> event_received{ false };
+    std::atomic<bool> event_received{false};
     frappe::watch_event received_event;
 
     frappe::file_watcher watcher;
     (void)watcher.add(_test_dir);
-    watcher.on_add([&](const frappe::watch_event& e) {
+    watcher.on_add([&](const frappe::watch_event &e) {
         received_event = e;
         event_received = true;
-        });
+    });
 
     (void)watcher.start();
 
@@ -165,15 +166,15 @@ TEST_F(WatcherTest, DetectFileModification) {
     auto test_file = _test_dir / "modify_test.txt";
     std::ofstream(test_file) << "initial content";
 
-    std::atomic<bool> event_received{ false };
+    std::atomic<bool> event_received{false};
     frappe::watch_event received_event;
 
     frappe::file_watcher watcher;
     (void)watcher.add(_test_dir);
-    watcher.on_change([&](const frappe::watch_event& e) {
+    watcher.on_change([&](const frappe::watch_event &e) {
         received_event = e;
         event_received = true;
-        });
+    });
 
     (void)watcher.start();
 
@@ -197,15 +198,15 @@ TEST_F(WatcherTest, DetectFileDeletion) {
     auto test_file = _test_dir / "delete_test.txt";
     std::ofstream(test_file) << "content to delete";
 
-    std::atomic<bool> event_received{ false };
+    std::atomic<bool> event_received{false};
     frappe::watch_event received_event;
 
     frappe::file_watcher watcher;
     (void)watcher.add(_test_dir);
-    watcher.on_remove([&](const frappe::watch_event& e) {
+    watcher.on_remove([&](const frappe::watch_event &e) {
         received_event = e;
         event_received = true;
-        });
+    });
 
     (void)watcher.start();
 
@@ -229,16 +230,12 @@ TEST_F(WatcherTest, DetectFileDeletion) {
 // ============================================================================
 
 TEST_F(WatcherTest, FilterCallback) {
-    std::atomic<int> event_count{ 0 };
+    std::atomic<int> event_count{0};
 
     frappe::file_watcher watcher;
     (void)watcher.add(_test_dir);
-    watcher.set_filter([](const frappe::path& p) {
-        return p.extension() == ".txt";
-        });
-    watcher.on_event([&](const frappe::watch_event&) {
-        ++event_count;
-        });
+    watcher.set_filter([](const frappe::path &p) { return p.extension() == ".txt"; });
+    watcher.on_event([&](const frappe::watch_event &) { ++event_count; });
 
     (void)watcher.start();
 

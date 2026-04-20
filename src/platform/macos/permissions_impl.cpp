@@ -1,40 +1,41 @@
 #ifdef FRAPPE_PLATFORM_MACOS
 
 #include "frappe/permissions.hpp"
+
+#include <cstring>
+#include <grp.h>
+#include <pwd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <pwd.h>
-#include <grp.h>
-#include <cstring>
 
 namespace frappe::detail {
 
-result<owner_info> get_owner_impl(const path& p) noexcept {
+result<owner_info> get_owner_impl(const path &p) noexcept {
     owner_info info;
-    
+
     struct stat st;
     if (stat(p.c_str(), &st) != 0) {
         return std::unexpected(make_error(errno, std::system_category()));
     }
-    
+
     info.uid = st.st_uid;
     info.gid = st.st_gid;
-    
-    struct passwd* pw = getpwuid(st.st_uid);
+
+    struct passwd *pw = getpwuid(st.st_uid);
     if (pw) {
         info.user_name = pw->pw_name;
     }
-    
-    struct group* gr = getgrgid(st.st_gid);
+
+    struct group *gr = getgrgid(st.st_gid);
     if (gr) {
         info.group_name = gr->gr_name;
     }
-    
+
     return info;
 }
 
-void_result set_owner_impl(const path& p, std::uint32_t uid, std::uint32_t gid) noexcept {
+void_result set_owner_impl(const path &p, std::uint32_t uid, std::uint32_t gid) noexcept {
     if (chown(p.c_str(), uid, gid) != 0) {
         return std::unexpected(make_error(errno, std::system_category()));
     }
@@ -43,7 +44,7 @@ void_result set_owner_impl(const path& p, std::uint32_t uid, std::uint32_t gid) 
 
 std::optional<std::uint32_t> user_id_from_name_impl(std::string_view name) noexcept {
     std::string name_str(name);
-    struct passwd* pw = getpwnam(name_str.c_str());
+    struct passwd *pw = getpwnam(name_str.c_str());
     if (pw) {
         return pw->pw_uid;
     }
@@ -51,7 +52,7 @@ std::optional<std::uint32_t> user_id_from_name_impl(std::string_view name) noexc
 }
 
 std::optional<std::string> user_name_from_id_impl(std::uint32_t uid) noexcept {
-    struct passwd* pw = getpwuid(uid);
+    struct passwd *pw = getpwuid(uid);
     if (pw) {
         return std::string(pw->pw_name);
     }
@@ -60,7 +61,7 @@ std::optional<std::string> user_name_from_id_impl(std::uint32_t uid) noexcept {
 
 std::optional<std::uint32_t> group_id_from_name_impl(std::string_view name) noexcept {
     std::string name_str(name);
-    struct group* gr = getgrnam(name_str.c_str());
+    struct group *gr = getgrnam(name_str.c_str());
     if (gr) {
         return gr->gr_gid;
     }
@@ -68,7 +69,7 @@ std::optional<std::uint32_t> group_id_from_name_impl(std::string_view name) noex
 }
 
 std::optional<std::string> group_name_from_id_impl(std::uint32_t gid) noexcept {
-    struct group* gr = getgrgid(gid);
+    struct group *gr = getgrgid(gid);
     if (gr) {
         return std::string(gr->gr_name);
     }
@@ -84,7 +85,7 @@ std::uint32_t current_group_id_impl() noexcept {
 }
 
 std::string current_user_name_impl() noexcept {
-    struct passwd* pw = getpwuid(getuid());
+    struct passwd *pw = getpwuid(getuid());
     if (pw) {
         return std::string(pw->pw_name);
     }
@@ -92,7 +93,7 @@ std::string current_user_name_impl() noexcept {
 }
 
 std::string current_group_name_impl() noexcept {
-    struct group* gr = getgrgid(getgid());
+    struct group *gr = getgrgid(getgid());
     if (gr) {
         return std::string(gr->gr_name);
     }
@@ -101,7 +102,7 @@ std::string current_group_name_impl() noexcept {
 
 std::vector<std::uint32_t> current_user_groups_impl() noexcept {
     std::vector<std::uint32_t> groups;
-    
+
     int ngroups = 0;
     getgrouplist(current_user_name_impl().c_str(), getgid(), nullptr, &ngroups);
     if (ngroups > 0) {
@@ -112,7 +113,7 @@ std::vector<std::uint32_t> current_user_groups_impl() noexcept {
             }
         }
     }
-    
+
     return groups;
 }
 
@@ -126,24 +127,24 @@ void set_umask_impl(perms mask) noexcept {
     umask(static_cast<mode_t>(mask) & 0777);
 }
 
-result<bool> check_access_impl(const path& p, access_rights rights) noexcept {
+result<bool> check_access_impl(const path &p, access_rights rights) noexcept {
     int mode = F_OK;
     if (has_right(rights, access_rights::read)) mode |= R_OK;
     if (has_right(rights, access_rights::write)) mode |= W_OK;
     if (has_right(rights, access_rights::execute)) mode |= X_OK;
-    
+
     if (access(p.c_str(), mode) == 0) return true;
     if (errno == EACCES) return false;
     return std::unexpected(make_error(errno, std::system_category()));
 }
 
-result<access_rights> get_effective_rights_impl(const path& p) noexcept {
+result<access_rights> get_effective_rights_impl(const path &p) noexcept {
     access_rights result = access_rights::none;
-    
+
     if (access(p.c_str(), R_OK) == 0) result = result | access_rights::read;
     if (access(p.c_str(), W_OK) == 0) result = result | access_rights::write;
     if (access(p.c_str(), X_OK) == 0) result = result | access_rights::execute;
-    
+
     struct stat st;
     if (stat(p.c_str(), &st) == 0) {
         if (S_ISDIR(st.st_mode)) {
@@ -160,41 +161,41 @@ result<access_rights> get_effective_rights_impl(const path& p) noexcept {
             }
         }
     }
-    
+
     return result;
 }
 
 // 4.5 ACL Support (stub)
-result<acl_info> get_acl_impl(const path& p, acl_type type) noexcept {
+result<acl_info> get_acl_impl(const path &p, acl_type type) noexcept {
     (void)p;
     (void)type;
     return acl_info{};
 }
 
-void_result set_acl_impl(const path& p, const acl_info& acl, acl_type type) noexcept {
+void_result set_acl_impl(const path &p, const acl_info &acl, acl_type type) noexcept {
     (void)p;
     (void)acl;
     (void)type;
     return std::unexpected(make_error(std::errc::function_not_supported));
 }
 
-result<bool> has_acl_impl(const path& p) noexcept {
+result<bool> has_acl_impl(const path &p) noexcept {
     (void)p;
     return false;
 }
 
-result<bool> is_acl_supported_impl(const path& p) noexcept {
+result<bool> is_acl_supported_impl(const path &p) noexcept {
     (void)p;
     return false;
 }
 
 // 4.6 Windows Attributes (not applicable on macOS)
-result<win_attributes> get_win_attributes_impl(const path& p) noexcept {
+result<win_attributes> get_win_attributes_impl(const path &p) noexcept {
     (void)p;
     return win_attributes::none;
 }
 
-void_result set_win_attributes_impl(const path& p, win_attributes attrs) noexcept {
+void_result set_win_attributes_impl(const path &p, win_attributes attrs) noexcept {
     (void)p;
     (void)attrs;
     return std::unexpected(make_error(std::errc::function_not_supported));
@@ -206,7 +207,7 @@ result<security_identifier> get_sid_impl(std::string_view account_name) noexcept
     return std::unexpected(make_error(std::errc::function_not_supported));
 }
 
-result<security_identifier> get_file_owner_sid_impl(const path& p) noexcept {
+result<security_identifier> get_file_owner_sid_impl(const path &p) noexcept {
     (void)p;
     return std::unexpected(make_error(std::errc::function_not_supported));
 }
@@ -246,7 +247,7 @@ result<security_identifier> lookup_account_impl(std::string_view domain, std::st
 result<std::vector<std::string>> get_local_users_impl() noexcept {
     std::vector<std::string> users;
     setpwent();
-    struct passwd* pw;
+    struct passwd *pw;
     while ((pw = getpwent()) != nullptr) {
         if (pw->pw_uid >= 500 || pw->pw_uid == 0) {
             users.push_back(pw->pw_name);
@@ -259,7 +260,7 @@ result<std::vector<std::string>> get_local_users_impl() noexcept {
 result<std::vector<std::string>> get_local_groups_impl() noexcept {
     std::vector<std::string> groups;
     setgrent();
-    struct group* gr;
+    struct group *gr;
     while ((gr = getgrent()) != nullptr) {
         groups.push_back(gr->gr_name);
     }

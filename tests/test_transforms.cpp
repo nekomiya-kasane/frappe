@@ -1,14 +1,15 @@
-#include <gtest/gtest.h>
 #include "frappe/transforms.hpp"
-#include <vector>
-#include <set>
+
+#include <gtest/gtest.h>
 #include <map>
+#include <set>
+#include <vector>
 
 using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string& name, std::uintmax_t size = 0) {
+file_entry make_entry(const std::string &name, std::uintmax_t size = 0) {
     file_entry e;
     e.file_path = name;
     e.name = name;
@@ -59,7 +60,7 @@ TEST(TransformsTest, MapToPaths) {
 
 TEST(TransformsTest, CustomMapTo) {
     auto entries = sample();
-    auto result = entries | map_to([](const file_entry& e) { return e.name + "!"; });
+    auto result = entries | map_to([](const file_entry &e) { return e.name + "!"; });
     ASSERT_EQ(result.size(), 3u);
     EXPECT_EQ(result[0], "a.cpp!");
 }
@@ -80,7 +81,7 @@ TEST(TransformsTest, Select) {
 
 TEST(TransformsTest, ToVector) {
     auto entries = sample();
-    auto view = entries | std::views::filter([](const file_entry& e) { return e.size > 100; });
+    auto view = entries | std::views::filter([](const file_entry &e) { return e.size > 100; });
     auto result = view | to_vector;
     EXPECT_EQ(result.size(), 2u);
 }
@@ -115,10 +116,8 @@ TEST(TransformsTest, PathToSize) {
 
 TEST(TransformsTest, FilterMap) {
     auto entries = sample();
-    auto result = entries | filter_map(
-        [](const file_entry& e) { return e.size > 100; },
-        [](const file_entry& e) { return e.name; }
-    );
+    auto result = entries | filter_map([](const file_entry &e) { return e.size > 100; },
+                                       [](const file_entry &e) { return e.name; });
     ASSERT_EQ(result.size(), 2u);
     EXPECT_EQ(result[0], "b.hpp");
     EXPECT_EQ(result[1], "c.txt");
@@ -129,7 +128,7 @@ TEST(TransformsTest, FilterMap) {
 TEST(TransformsTest, Tap) {
     auto entries = sample();
     int count = 0;
-    auto result = entries | tap([&count](const file_entry&) { ++count; });
+    auto result = entries | tap([&count](const file_entry &) { ++count; });
     EXPECT_EQ(count, 3);
     EXPECT_EQ(result.size(), 3u);
 }
@@ -138,10 +137,8 @@ TEST(TransformsTest, Tap) {
 
 TEST(TransformsTest, Reduce) {
     auto entries = sample();
-    auto total = entries | reduce(
-        [](std::uintmax_t acc, const file_entry& e) { return acc + e.size; },
-        std::uintmax_t{0}
-    );
+    auto total =
+        entries | reduce([](std::uintmax_t acc, const file_entry &e) { return acc + e.size; }, std::uintmax_t{0});
     EXPECT_EQ(total, 600u);
 }
 
@@ -149,10 +146,8 @@ TEST(TransformsTest, Reduce) {
 
 TEST(TransformsTest, Scan) {
     auto entries = sample();
-    auto running = entries | scan(
-        [](std::uintmax_t acc, const file_entry& e) { return acc + e.size; },
-        std::uintmax_t{0}
-    );
+    auto running =
+        entries | scan([](std::uintmax_t acc, const file_entry &e) { return acc + e.size; }, std::uintmax_t{0});
     ASSERT_EQ(running.size(), 3u);
     EXPECT_EQ(running[0], 100u);
     EXPECT_EQ(running[1], 300u);
@@ -187,9 +182,7 @@ TEST(TransformsTest, EmptyMapTo) {
 
 TEST(TransformsTest, EmptyReduce) {
     std::vector<file_entry> entries;
-    auto total = entries | reduce(
-        [](std::uintmax_t acc, const file_entry& e) { return acc + e.size; },
-        std::uintmax_t{0}
-    );
+    auto total =
+        entries | reduce([](std::uintmax_t acc, const file_entry &e) { return acc + e.size; }, std::uintmax_t{0});
     EXPECT_EQ(total, 0u);
 }

@@ -1,13 +1,12 @@
-#include <gtest/gtest.h>
 #include "frappe/async.hpp"
+
 #include <filesystem>
+#include <gtest/gtest.h>
 
 class AsyncTest : public ::testing::Test {
-protected:
-    void SetUp() override {
-        _test_path = std::filesystem::temp_directory_path();
-    }
-    
+  protected:
+    void SetUp() override { _test_path = std::filesystem::temp_directory_path(); }
+
     std::filesystem::path _test_path;
 };
 
@@ -28,13 +27,13 @@ TEST_F(AsyncTest, ProgressInfoDefault) {
 // ============================================================================
 
 TEST_F(AsyncTest, GetDefaultThreadPool) {
-    auto& pool = frappe::get_default_thread_pool();
-    (void)pool;  // Just verify it doesn't crash
+    auto &pool = frappe::get_default_thread_pool();
+    (void)pool; // Just verify it doesn't crash
 }
 
 TEST_F(AsyncTest, GetDefaultScheduler) {
     auto scheduler = frappe::get_default_scheduler();
-    (void)scheduler;  // Just verify it doesn't crash
+    (void)scheduler; // Just verify it doesn't crash
 }
 
 // ============================================================================
@@ -45,8 +44,8 @@ TEST_F(AsyncTest, ListDisksSender) {
     auto sender = frappe::list_disks_sender();
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [disks] = *result;
+
+    auto &[disks] = *result;
     EXPECT_TRUE(disks.has_value());
     EXPECT_GT(disks->size(), 0u);
 }
@@ -55,8 +54,8 @@ TEST_F(AsyncTest, ListPartitionsSender) {
     auto sender = frappe::list_partitions_sender();
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [partitions] = *result;
+
+    auto &[partitions] = *result;
     EXPECT_TRUE(partitions.has_value());
 }
 
@@ -64,8 +63,8 @@ TEST_F(AsyncTest, ListMountsSender) {
     auto sender = frappe::list_mounts_sender();
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [mounts] = *result;
+
+    auto &[mounts] = *result;
     EXPECT_TRUE(mounts.has_value());
     EXPECT_GT(mounts->size(), 0u);
 }
@@ -75,12 +74,12 @@ TEST_F(AsyncTest, GetDiskInfoSender) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
     ASSERT_GT(disks->size(), 0u);
-    
+
     auto sender = frappe::get_disk_info_sender(disks->front().device_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [info] = *result;
+
+    auto &[info] = *result;
     EXPECT_TRUE(info.has_value());
     EXPECT_EQ(info->device_path, disks->front().device_path);
 }
@@ -89,12 +88,12 @@ TEST_F(AsyncTest, GetPartitionTableSender) {
     auto disks = frappe::list_disks();
     ASSERT_TRUE(disks.has_value());
     ASSERT_GT(disks->size(), 0u);
-    
+
     auto sender = frappe::get_partition_table_sender(disks->front().device_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [table] = *result;
+
+    auto &[table] = *result;
     EXPECT_TRUE(table.has_value());
 }
 
@@ -106,8 +105,8 @@ TEST_F(AsyncTest, GetPermissionsSender) {
     auto sender = frappe::get_permissions_sender(_test_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [perms] = *result;
+
+    auto &[perms] = *result;
     EXPECT_TRUE(perms.has_value());
 }
 
@@ -115,8 +114,8 @@ TEST_F(AsyncTest, CheckAccessSender) {
     auto sender = frappe::check_access_sender(_test_path, frappe::access_rights::read);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [can_access] = *result;
+
+    auto &[can_access] = *result;
     EXPECT_TRUE(can_access.has_value());
     EXPECT_TRUE(*can_access);
 }
@@ -127,28 +126,28 @@ TEST_F(AsyncTest, CheckAccessSender) {
 
 TEST_F(AsyncTest, GetPermissionsBulkSender) {
     std::vector<frappe::path> paths = {_test_path, _test_path};
-    
+
     auto sender = frappe::get_permissions_bulk_sender(std::move(paths));
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [perms_list] = *result;
+
+    auto &[perms_list] = *result;
     EXPECT_EQ(perms_list.size(), 2u);
-    for (const auto& p : perms_list) {
+    for (const auto &p : perms_list) {
         EXPECT_TRUE(p.has_value());
     }
 }
 
 TEST_F(AsyncTest, CheckAccessBulkSender) {
     std::vector<frappe::path> paths = {_test_path, _test_path};
-    
+
     auto sender = frappe::check_access_bulk_sender(std::move(paths), frappe::access_rights::read);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [access_list] = *result;
+
+    auto &[access_list] = *result;
     EXPECT_EQ(access_list.size(), 2u);
-    for (const auto& a : access_list) {
+    for (const auto &a : access_list) {
         EXPECT_TRUE(a.has_value());
         EXPECT_TRUE(*a);
     }
@@ -162,8 +161,8 @@ TEST_F(AsyncTest, OnThreadPool) {
     auto sender = frappe::on_thread_pool(frappe::list_mounts_sender());
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [mounts] = *result;
+
+    auto &[mounts] = *result;
     EXPECT_TRUE(mounts.has_value());
 }
 
@@ -172,18 +171,17 @@ TEST_F(AsyncTest, OnThreadPool) {
 // ============================================================================
 
 TEST_F(AsyncTest, ChainedSenders) {
-    auto sender = frappe::list_disks_sender()
-        | stdexec::then([](frappe::result<std::vector<frappe::disk_info>> disks) {
-            if (disks.has_value() && !disks->empty()) {
-                return disks->front().device_path;
-            }
-            return std::string{};
-        });
-    
+    auto sender = frappe::list_disks_sender() | stdexec::then([](frappe::result<std::vector<frappe::disk_info>> disks) {
+                      if (disks.has_value() && !disks->empty()) {
+                          return disks->front().device_path;
+                      }
+                      return std::string{};
+                  });
+
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [device_path] = *result;
+
+    auto &[device_path] = *result;
     EXPECT_FALSE(device_path.empty());
 }
 
@@ -195,8 +193,8 @@ TEST_F(AsyncTest, FindSender) {
     auto sender = frappe::find_sender(_test_path, frappe::find_options{}.is_file());
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [paths] = *result;
+
+    auto &[paths] = *result;
     EXPECT_GE(paths.size(), 1u);
 }
 
@@ -204,8 +202,8 @@ TEST_F(AsyncTest, FindCountSender) {
     auto sender = frappe::find_count_sender(_test_path, frappe::find_options{}.is_file());
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [count] = *result;
+
+    auto &[count] = *result;
     EXPECT_GE(count, 1u);
 }
 
@@ -217,8 +215,8 @@ TEST_F(AsyncTest, ListNetworkSharesSender) {
     auto sender = frappe::list_network_shares_sender();
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [shares] = *result;
+
+    auto &[shares] = *result;
     EXPECT_TRUE(shares.has_value());
 }
 
@@ -226,8 +224,8 @@ TEST_F(AsyncTest, IsNetworkPathSender) {
     auto sender = frappe::is_network_path_sender(_test_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [is_network] = *result;
+
+    auto &[is_network] = *result;
     EXPECT_TRUE(is_network.has_value());
     EXPECT_FALSE(*is_network);
 }
@@ -240,8 +238,8 @@ TEST_F(AsyncTest, ListRemovableDevicesSender) {
     auto sender = frappe::list_removable_devices_sender();
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [devices] = *result;
+
+    auto &[devices] = *result;
     EXPECT_TRUE(devices.has_value());
 }
 
@@ -249,8 +247,8 @@ TEST_F(AsyncTest, IsDeviceReadySender) {
     auto sender = frappe::is_device_ready_sender(_test_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [ready] = *result;
+
+    auto &[ready] = *result;
     EXPECT_TRUE(ready.has_value());
     EXPECT_TRUE(*ready);
 }
@@ -263,8 +261,8 @@ TEST_F(AsyncTest, IsCloudPathSender) {
     auto sender = frappe::is_cloud_path_sender(_test_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [is_cloud] = *result;
+
+    auto &[is_cloud] = *result;
     EXPECT_TRUE(is_cloud.has_value());
 }
 
@@ -272,8 +270,8 @@ TEST_F(AsyncTest, ListCloudMountsSender) {
     auto sender = frappe::list_cloud_mounts_sender();
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [mounts] = *result;
+
+    auto &[mounts] = *result;
     EXPECT_TRUE(mounts.has_value());
 }
 
@@ -285,8 +283,8 @@ TEST_F(AsyncTest, IsVirtualFilesystemSender) {
     auto sender = frappe::is_virtual_filesystem_sender(_test_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [is_virtual] = *result;
+
+    auto &[is_virtual] = *result;
     EXPECT_TRUE(is_virtual.has_value());
 }
 
@@ -294,8 +292,8 @@ TEST_F(AsyncTest, IsFuseMountSender) {
     auto sender = frappe::is_fuse_mount_sender(_test_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [is_fuse] = *result;
+
+    auto &[is_fuse] = *result;
     EXPECT_TRUE(is_fuse.has_value());
     EXPECT_FALSE(*is_fuse);
 }
@@ -308,8 +306,8 @@ TEST_F(AsyncTest, GetFilesystemTypeSender) {
     auto sender = frappe::get_filesystem_type_sender(_test_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [fs_type] = *result;
+
+    auto &[fs_type] = *result;
     EXPECT_TRUE(fs_type.has_value());
 }
 
@@ -317,8 +315,8 @@ TEST_F(AsyncTest, ListVolumesSender) {
     auto sender = frappe::list_volumes_sender();
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [volumes] = *result;
+
+    auto &[volumes] = *result;
     EXPECT_TRUE(volumes.has_value());
     EXPECT_FALSE(volumes->empty());
 }
@@ -327,8 +325,8 @@ TEST_F(AsyncTest, SpaceSender) {
     auto sender = frappe::space_sender(_test_path);
     auto result = frappe::sync_wait(std::move(sender));
     ASSERT_TRUE(result.has_value());
-    
-    auto& [space_info] = *result;
+
+    auto &[space_info] = *result;
     EXPECT_TRUE(space_info.has_value());
     EXPECT_GT(space_info->capacity, 0u);
 }

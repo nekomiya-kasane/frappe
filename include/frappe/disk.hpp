@@ -1,14 +1,15 @@
 #ifndef FRAPPE_DISK_HPP
 #define FRAPPE_DISK_HPP
 
-#include "frappe/exports.hpp"
 #include "frappe/error.hpp"
+#include "frappe/exports.hpp"
 #include "frappe/filesystem.hpp"
+
+#include <cstdint>
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <vector>
-#include <cstdint>
-#include <optional>
 
 namespace frappe {
 
@@ -20,11 +21,11 @@ using path = std::filesystem::path;
 
 enum class partition_table_type {
     unknown,
-    mbr,        // Master Boot Record
-    gpt,        // GUID Partition Table
-    apm,        // Apple Partition Map
-    bsd,        // BSD disklabel
-    sun         // Sun VTOC
+    mbr, // Master Boot Record
+    gpt, // GUID Partition Table
+    apm, // Apple Partition Map
+    bsd, // BSD disklabel
+    sun  // Sun VTOC
 };
 
 [[nodiscard]] FRAPPE_API std::string_view partition_table_type_name(partition_table_type type) noexcept;
@@ -76,30 +77,30 @@ enum class partition_type {
 // ============================================================================
 
 struct partition_info {
-    std::string device_path;        // e.g., /dev/sda1, \\.\PhysicalDrive0
+    std::string device_path; // e.g., /dev/sda1, \\.\PhysicalDrive0
     std::uint32_t partition_number = 0;
-    std::string label;              // Volume label
-    std::string uuid;               // Partition UUID
-    std::string type_uuid;          // Partition type UUID (GPT)
-    std::uint8_t type_id = 0;       // Partition type ID (MBR)
+    std::string label;        // Volume label
+    std::string uuid;         // Partition UUID
+    std::string type_uuid;    // Partition type UUID (GPT)
+    std::uint8_t type_id = 0; // Partition type ID (MBR)
     partition_type type = partition_type::unknown;
-    
+
     std::uint64_t start_sector = 0;
     std::uint64_t end_sector = 0;
     std::uint64_t sector_count = 0;
-    std::uint64_t offset = 0;       // Start offset in bytes
-    std::uint64_t size = 0;         // Size in bytes
-    
+    std::uint64_t offset = 0; // Start offset in bytes
+    std::uint64_t size = 0;   // Size in bytes
+
     filesystem_type fs_type = filesystem_type::unknown;
-    
+
     bool is_bootable = false;
     bool is_active = false;
     bool is_primary = false;
     bool is_extended = false;
     bool is_logical = false;
     bool is_hidden = false;
-    
-    std::string mount_point;        // If mounted
+
+    std::string mount_point; // If mounted
 };
 
 // ============================================================================
@@ -109,16 +110,16 @@ struct partition_info {
 struct partition_table_info {
     std::string device_path;
     partition_table_type type = partition_table_type::unknown;
-    std::string disk_uuid;          // GPT disk GUID
+    std::string disk_uuid;            // GPT disk GUID
     std::uint32_t disk_signature = 0; // MBR signature
-    
+
     std::uint64_t disk_size = 0;
     std::uint32_t sector_size = 512;
     std::uint32_t physical_sector_size = 512;
     std::uint64_t total_sectors = 0;
     std::uint64_t first_usable_sector = 0;
     std::uint64_t last_usable_sector = 0;
-    
+
     std::vector<partition_info> partitions;
 };
 
@@ -129,8 +130,8 @@ struct partition_table_info {
 struct free_region {
     std::uint64_t start_sector = 0;
     std::uint64_t end_sector = 0;
-    std::uint64_t size = 0;         // Size in bytes
-    bool is_primary_slot = false;   // Can create primary partition
+    std::uint64_t size = 0;       // Size in bytes
+    bool is_primary_slot = false; // Can create primary partition
 };
 
 // ============================================================================
@@ -139,15 +140,15 @@ struct free_region {
 
 enum class disk_type {
     unknown,
-    hdd,            // Hard Disk Drive
-    ssd,            // Solid State Drive
-    nvme,           // NVMe SSD
-    usb,            // USB Drive
-    optical,        // CD/DVD/Blu-ray
-    floppy,         // Floppy disk
-    virtual_disk,   // Virtual disk
-    ram_disk,       // RAM disk
-    network         // iSCSI, etc.
+    hdd,          // Hard Disk Drive
+    ssd,          // Solid State Drive
+    nvme,         // NVMe SSD
+    usb,          // USB Drive
+    optical,      // CD/DVD/Blu-ray
+    floppy,       // Floppy disk
+    virtual_disk, // Virtual disk
+    ram_disk,     // RAM disk
+    network       // iSCSI, etc.
 };
 
 enum class disk_bus_type {
@@ -162,31 +163,31 @@ enum class disk_bus_type {
     thunderbolt,
     firewire,
     virtual_bus,
-    mmc,            // SD/MMC
+    mmc, // SD/MMC
     raid
 };
 
 struct disk_info {
-    std::string device_path;        // e.g., /dev/sda, \\.\PhysicalDrive0
+    std::string device_path; // e.g., /dev/sda, \\.\PhysicalDrive0
     std::string model;
     std::string vendor;
     std::string serial;
     std::string firmware_version;
-    
+
     disk_type type = disk_type::unknown;
     disk_bus_type bus_type = disk_bus_type::unknown;
-    
-    std::uint64_t size = 0;         // Total size in bytes
+
+    std::uint64_t size = 0; // Total size in bytes
     std::uint32_t sector_size = 512;
     std::uint32_t physical_sector_size = 512;
     std::uint64_t total_sectors = 0;
-    
+
     bool is_removable = false;
     bool is_readonly = false;
     bool is_system_disk = false;
     bool is_boot_disk = false;
-    bool has_media = true;          // For optical/removable
-    
+    bool has_media = true; // For optical/removable
+
     partition_table_type partition_table = partition_table_type::unknown;
     std::uint32_t partition_count = 0;
 };
@@ -201,11 +202,11 @@ struct disk_info {
 // Disk enumeration
 [[nodiscard]] FRAPPE_API result<std::vector<disk_info>> list_disks() noexcept;
 [[nodiscard]] FRAPPE_API result<disk_info> get_disk_info(std::string_view device_path) noexcept;
-[[nodiscard]] FRAPPE_API result<disk_info> get_disk_for_path(const path& p) noexcept;
+[[nodiscard]] FRAPPE_API result<disk_info> get_disk_for_path(const path &p) noexcept;
 
 // Partition table
 [[nodiscard]] FRAPPE_API result<partition_table_info> get_partition_table(std::string_view device_path) noexcept;
-[[nodiscard]] FRAPPE_API result<partition_info> get_partition_info(const path& p) noexcept;
+[[nodiscard]] FRAPPE_API result<partition_info> get_partition_info(const path &p) noexcept;
 
 // Partition enumeration
 [[nodiscard]] FRAPPE_API result<std::vector<partition_info>> list_partitions() noexcept;
@@ -218,19 +219,19 @@ struct disk_info {
 [[nodiscard]] FRAPPE_API result<std::uint64_t> get_total_free_space(std::string_view device_path) noexcept;
 
 // Utility
-[[nodiscard]] FRAPPE_API result<std::string> get_containing_device(const path& p) noexcept;
-[[nodiscard]] FRAPPE_API result<bool> is_system_partition(const path& p) noexcept;
-[[nodiscard]] FRAPPE_API result<bool> is_boot_partition(const path& p) noexcept;
+[[nodiscard]] FRAPPE_API result<std::string> get_containing_device(const path &p) noexcept;
+[[nodiscard]] FRAPPE_API result<bool> is_system_partition(const path &p) noexcept;
+[[nodiscard]] FRAPPE_API result<bool> is_boot_partition(const path &p) noexcept;
 
 // ============================================================================
 // 7.12 Mount Information
 // ============================================================================
 
 struct mount_info {
-    std::string device;             // Device path
-    std::string mount_point;        // Mount point path
+    std::string device;      // Device path
+    std::string mount_point; // Mount point path
     filesystem_type fs_type = filesystem_type::unknown;
-    std::string fs_type_name;       // Raw filesystem type string
+    std::string fs_type_name; // Raw filesystem type string
     std::vector<std::string> options;
     bool is_readonly = false;
     bool is_network = false;
@@ -239,11 +240,11 @@ struct mount_info {
 
 // Mount enumeration
 [[nodiscard]] FRAPPE_API result<std::vector<mount_info>> list_mounts() noexcept;
-[[nodiscard]] FRAPPE_API result<mount_info> get_mount_info(const path& p) noexcept;
+[[nodiscard]] FRAPPE_API result<mount_info> get_mount_info(const path &p) noexcept;
 [[nodiscard]] FRAPPE_API result<bool> is_mounted(std::string_view device) noexcept;
 [[nodiscard]] FRAPPE_API result<std::string> get_mount_point(std::string_view device) noexcept;
-[[nodiscard]] FRAPPE_API result<std::string> get_device_by_mount_point(const path& mount_point) noexcept;
-[[nodiscard]] FRAPPE_API result<bool> is_mount_point(const path& p) noexcept;
+[[nodiscard]] FRAPPE_API result<std::string> get_device_by_mount_point(const path &mount_point) noexcept;
+[[nodiscard]] FRAPPE_API result<bool> is_mount_point(const path &p) noexcept;
 
 // Additional disk queries
 [[nodiscard]] FRAPPE_API result<std::vector<partition_info>> list_unmounted_partitions() noexcept;
@@ -262,13 +263,7 @@ struct mount_info {
 // 7.9 S.M.A.R.T. Information
 // ============================================================================
 
-enum class smart_status {
-    unknown,
-    good,
-    warning,
-    critical,
-    failing
-};
+enum class smart_status { unknown, good, warning, critical, failing };
 
 [[nodiscard]] FRAPPE_API std::string_view smart_status_name(smart_status status) noexcept;
 
@@ -286,21 +281,22 @@ struct smart_info {
     bool is_supported = false;
     bool is_enabled = false;
     smart_status health_status = smart_status::unknown;
-    
-    std::optional<std::int32_t> temperature;           // Celsius
+
+    std::optional<std::int32_t> temperature; // Celsius
     std::optional<std::uint64_t> power_on_hours;
     std::optional<std::uint64_t> power_cycle_count;
     std::optional<std::uint64_t> reallocated_sectors;
     std::optional<std::uint64_t> pending_sectors;
     std::optional<std::uint64_t> uncorrectable_errors;
-    
+
     std::vector<smart_attribute> attributes;
 };
 
 [[nodiscard]] FRAPPE_API result<smart_info> get_smart_info(std::string_view device_path) noexcept;
 [[nodiscard]] FRAPPE_API result<bool> is_smart_supported(std::string_view device_path) noexcept;
 [[nodiscard]] FRAPPE_API result<smart_status> get_disk_health(std::string_view device_path) noexcept;
-[[nodiscard]] FRAPPE_API result<std::optional<std::int32_t>> get_disk_temperature(std::string_view device_path) noexcept;
+[[nodiscard]] FRAPPE_API result<std::optional<std::int32_t>>
+get_disk_temperature(std::string_view device_path) noexcept;
 
 // ============================================================================
 // 7.10 NVMe Information
@@ -311,23 +307,23 @@ struct nvme_info {
     std::uint32_t namespace_id = 0;
     std::string pci_address;
     std::uint8_t firmware_slot = 0;
-    
-    std::uint8_t available_spare = 0;           // Percentage
+
+    std::uint8_t available_spare = 0; // Percentage
     std::uint8_t available_spare_threshold = 0;
     std::uint8_t percentage_used = 0;
-    
-    std::uint64_t data_units_read = 0;          // In 512KB units
+
+    std::uint64_t data_units_read = 0; // In 512KB units
     std::uint64_t data_units_written = 0;
     std::uint64_t host_read_commands = 0;
     std::uint64_t host_write_commands = 0;
-    std::uint64_t controller_busy_time = 0;     // Minutes
+    std::uint64_t controller_busy_time = 0; // Minutes
     std::uint64_t power_cycles = 0;
     std::uint64_t power_on_hours = 0;
     std::uint64_t unsafe_shutdowns = 0;
     std::uint64_t media_errors = 0;
     std::uint64_t error_log_entries = 0;
-    
-    std::optional<std::int32_t> temperature;    // Celsius
+
+    std::optional<std::int32_t> temperature; // Celsius
     std::optional<std::int32_t> warning_temp_threshold;
     std::optional<std::int32_t> critical_temp_threshold;
 };
@@ -341,35 +337,27 @@ struct nvme_info {
 
 enum class storage_pool_type {
     unknown,
-    lvm,                // Linux LVM
-    zfs,                // ZFS pool
-    btrfs,              // Btrfs RAID
-    mdraid,             // Linux MD RAID
-    storage_spaces,     // Windows Storage Spaces
-    apfs_container      // macOS APFS Container
+    lvm,            // Linux LVM
+    zfs,            // ZFS pool
+    btrfs,          // Btrfs RAID
+    mdraid,         // Linux MD RAID
+    storage_spaces, // Windows Storage Spaces
+    apfs_container  // macOS APFS Container
 };
 
 enum class raid_level {
     unknown,
-    raid0,      // Striping
-    raid1,      // Mirroring
-    raid5,      // Striping with parity
-    raid6,      // Striping with double parity
-    raid10,     // Mirrored stripes
-    raid01,     // Striped mirrors
-    jbod,       // Just a Bunch Of Disks
-    single      // Single device
+    raid0,  // Striping
+    raid1,  // Mirroring
+    raid5,  // Striping with parity
+    raid6,  // Striping with double parity
+    raid10, // Mirrored stripes
+    raid01, // Striped mirrors
+    jbod,   // Just a Bunch Of Disks
+    single  // Single device
 };
 
-enum class raid_state {
-    unknown,
-    active,
-    degraded,
-    rebuilding,
-    resyncing,
-    failed,
-    inactive
-};
+enum class raid_state { unknown, active, degraded, rebuilding, resyncing, failed, inactive };
 
 [[nodiscard]] FRAPPE_API std::string_view storage_pool_type_name(storage_pool_type type) noexcept;
 [[nodiscard]] FRAPPE_API std::string_view raid_level_name(raid_level level) noexcept;
@@ -382,23 +370,23 @@ struct storage_pool_info {
     std::uint64_t used = 0;
     std::uint64_t free = 0;
     smart_status health = smart_status::unknown;
-    std::vector<std::string> members;           // Member device paths
+    std::vector<std::string> members; // Member device paths
 };
 
 struct raid_info {
     std::string name;
-    std::string device_path;                    // e.g., /dev/md0
+    std::string device_path; // e.g., /dev/md0
     raid_level level = raid_level::unknown;
     raid_state state = raid_state::unknown;
     std::uint64_t size = 0;
-    std::uint32_t chunk_size = 0;               // Stripe size in bytes
-    
+    std::uint32_t chunk_size = 0; // Stripe size in bytes
+
     std::vector<std::string> devices;
     std::vector<std::string> spare_devices;
     std::vector<std::string> failed_devices;
-    
-    std::optional<double> sync_progress;        // 0.0 - 1.0
-    std::optional<std::uint64_t> sync_speed;    // Bytes per second
+
+    std::optional<double> sync_progress;     // 0.0 - 1.0
+    std::optional<std::uint64_t> sync_speed; // Bytes per second
 };
 
 [[nodiscard]] FRAPPE_API result<std::vector<storage_pool_info>> list_storage_pools() noexcept;
@@ -412,17 +400,17 @@ struct raid_info {
 
 enum class virtual_disk_type {
     unknown,
-    vhd,        // Virtual Hard Disk (Microsoft)
-    vhdx,       // Hyper-V Virtual Hard Disk
-    vmdk,       // VMware Virtual Machine Disk
-    vdi,        // VirtualBox Disk Image
-    qcow,       // QEMU Copy-On-Write
-    qcow2,      // QEMU Copy-On-Write v2
-    raw,        // Raw disk image
-    iso,        // ISO 9660 image
-    dmg,        // macOS Disk Image
-    sparse,     // Sparse file image
-    img         // Generic disk image
+    vhd,    // Virtual Hard Disk (Microsoft)
+    vhdx,   // Hyper-V Virtual Hard Disk
+    vmdk,   // VMware Virtual Machine Disk
+    vdi,    // VirtualBox Disk Image
+    qcow,   // QEMU Copy-On-Write
+    qcow2,  // QEMU Copy-On-Write v2
+    raw,    // Raw disk image
+    iso,    // ISO 9660 image
+    dmg,    // macOS Disk Image
+    sparse, // Sparse file image
+    img     // Generic disk image
 };
 
 [[nodiscard]] FRAPPE_API std::string_view virtual_disk_type_name(virtual_disk_type type) noexcept;
@@ -430,32 +418,32 @@ enum class virtual_disk_type {
 struct virtual_disk_info {
     path file_path;
     virtual_disk_type type = virtual_disk_type::unknown;
-    
-    std::uint64_t virtual_size = 0;             // Allocated/max size
-    std::uint64_t actual_size = 0;              // Actual file size
+
+    std::uint64_t virtual_size = 0; // Allocated/max size
+    std::uint64_t actual_size = 0;  // Actual file size
     std::uint32_t block_size = 0;
-    
-    bool is_dynamic = false;                    // Dynamically expanding
-    bool is_differencing = false;               // Differencing/snapshot disk
-    std::optional<path> parent_path;            // Parent disk for differencing
-    
+
+    bool is_dynamic = false;         // Dynamically expanding
+    bool is_differencing = false;    // Differencing/snapshot disk
+    std::optional<path> parent_path; // Parent disk for differencing
+
     bool is_mounted = false;
     std::optional<std::string> mount_point;
-    
+
     bool is_encrypted = false;
-    std::optional<std::string> compression;     // Compression type if any
-    
+    std::optional<std::string> compression; // Compression type if any
+
     std::optional<std::string> uuid;
     std::optional<std::filesystem::file_time_type> creation_time;
     std::optional<std::filesystem::file_time_type> modification_time;
 };
 
-[[nodiscard]] FRAPPE_API result<bool> is_virtual_disk(const path& p) noexcept;
-[[nodiscard]] FRAPPE_API result<virtual_disk_type> get_virtual_disk_type(const path& p) noexcept;
-[[nodiscard]] FRAPPE_API result<virtual_disk_info> get_virtual_disk_info(const path& p) noexcept;
+[[nodiscard]] FRAPPE_API result<bool> is_virtual_disk(const path &p) noexcept;
+[[nodiscard]] FRAPPE_API result<virtual_disk_type> get_virtual_disk_type(const path &p) noexcept;
+[[nodiscard]] FRAPPE_API result<virtual_disk_info> get_virtual_disk_info(const path &p) noexcept;
 [[nodiscard]] FRAPPE_API result<std::vector<virtual_disk_info>> list_mounted_virtual_disks() noexcept;
-[[nodiscard]] FRAPPE_API result<std::vector<path>> list_virtual_disk_files(const path& directory) noexcept;
-[[nodiscard]] FRAPPE_API result<std::vector<path>> get_virtual_disk_chain(const path& p) noexcept;
+[[nodiscard]] FRAPPE_API result<std::vector<path>> list_virtual_disk_files(const path &directory) noexcept;
+[[nodiscard]] FRAPPE_API result<std::vector<path>> get_virtual_disk_chain(const path &p) noexcept;
 
 } // namespace frappe
 

@@ -1,6 +1,7 @@
-#include <gtest/gtest.h>
 #include "frappe/regex.hpp"
+
 #include <filesystem>
+#include <gtest/gtest.h>
 #include <vector>
 
 TEST(RegexTest, CompileValid) {
@@ -11,9 +12,7 @@ TEST(RegexTest, CompileValid) {
 }
 
 TEST(RegexTest, CompileInvalid) {
-    EXPECT_THROW({
-        auto re = frappe::compile_regex("[invalid");
-    }, frappe::regex_error);
+    EXPECT_THROW({ auto re = frappe::compile_regex("[invalid"); }, frappe::regex_error);
 }
 
 TEST(RegexTest, MatchSimple) {
@@ -84,44 +83,35 @@ TEST(RegexTest, RegexReplacePath) {
 }
 
 TEST(RegexTest, RegexReplaceString) {
-    auto result = frappe::regex_replace(std::string_view("hello_world.txt"), std::string_view("_"), std::string_view("-"));
+    auto result =
+        frappe::regex_replace(std::string_view("hello_world.txt"), std::string_view("_"), std::string_view("-"));
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, "hello-world.txt");
 }
 
 TEST(RegexTest, FilterRegex) {
-    std::vector<frappe::path> paths = {
-        "/path/file1.cpp",
-        "/path/file2.hpp",
-        "/path/file3.cpp",
-        "/path/file4.txt"
-    };
-    
+    std::vector<frappe::path> paths = {"/path/file1.cpp", "/path/file2.hpp", "/path/file3.cpp", "/path/file4.txt"};
+
     auto filtered = paths | frappe::filter_regex(".*\\.cpp");
-    
+
     std::vector<frappe::path> result;
-    for (const auto& p : filtered) {
+    for (const auto &p : filtered) {
         result.push_back(p);
     }
-    
+
     EXPECT_EQ(result.size(), 2u);
 }
 
 TEST(RegexTest, FilterRegexNot) {
-    std::vector<frappe::path> paths = {
-        "/path/file1.cpp",
-        "/path/file2.hpp",
-        "/path/file3.cpp",
-        "/path/file4.txt"
-    };
-    
+    std::vector<frappe::path> paths = {"/path/file1.cpp", "/path/file2.hpp", "/path/file3.cpp", "/path/file4.txt"};
+
     auto filtered = paths | frappe::filter_regex_not(".*\\.cpp");
-    
+
     std::vector<frappe::path> result;
-    for (const auto& p : filtered) {
+    for (const auto &p : filtered) {
         result.push_back(p);
     }
-    
+
     EXPECT_EQ(result.size(), 2u);
 }
 
@@ -133,7 +123,7 @@ TEST(RegexTest, PatternGetter) {
 TEST(RegexTest, MoveSemantics) {
     auto re1 = frappe::compile_regex("hello");
     EXPECT_TRUE(re1.valid());
-    
+
     auto re2 = std::move(re1);
     EXPECT_TRUE(re2.valid());
     EXPECT_TRUE(re2.match("hello"));

@@ -4,21 +4,21 @@
 // A SQL-expressive, CPO-based range adapter library built on range-v3
 
 // Core infrastructure
+#include "comparator.hpp"
 #include "concepts.hpp"
 #include "pipeable.hpp"
-#include "comparator.hpp"
 
 // Filtering
+#include "combine.hpp"
 #include "filter.hpp"
 #include "filters_ext.hpp"
-#include "combine.hpp"
 
 // Sorting
 #include "sort.hpp"
 
 // Selection and projection
-#include "select.hpp"
 #include "distinct.hpp"
+#include "select.hpp"
 
 // Aggregation
 #include "aggregate.hpp"

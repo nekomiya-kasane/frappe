@@ -1,13 +1,14 @@
-#include <gtest/gtest.h>
 #include "frappe/traversal.hpp"
+
 #include <filesystem>
 #include <fstream>
+#include <gtest/gtest.h>
 #include <set>
 
 namespace fs = std::filesystem;
 
 class TraversalTest : public ::testing::Test {
-protected:
+  protected:
     fs::path tmp_dir_;
 
     void SetUp() override {
@@ -22,7 +23,7 @@ protected:
         fs::remove_all(tmp_dir_, ec);
     }
 
-    void touch(const fs::path& p) {
+    void touch(const fs::path &p) {
         fs::create_directories(p.parent_path());
         std::ofstream f(p);
         f << "test";
@@ -43,7 +44,7 @@ TEST_F(TraversalTest, TraverseCollectFlat) {
     EXPECT_EQ(entries.size(), 3u);
 
     std::set<std::string> names;
-    for (auto& e : entries) names.insert(e.name);
+    for (auto &e : entries) names.insert(e.name);
     EXPECT_TRUE(names.count("a.txt"));
     EXPECT_TRUE(names.count("b.txt"));
     EXPECT_TRUE(names.count("c.txt"));
@@ -71,7 +72,7 @@ TEST_F(TraversalTest, TraverseWithMaxDepth) {
     // Should find top.txt and d1/ (and maybe d1/mid.txt at depth 1)
     // but NOT d1/d2/bottom.txt
     std::set<std::string> names;
-    for (auto& e : entries) names.insert(e.name);
+    for (auto &e : entries) names.insert(e.name);
     EXPECT_TRUE(names.count("top.txt"));
     EXPECT_FALSE(names.count("bottom.txt"));
 }
@@ -93,11 +94,10 @@ TEST_F(TraversalTest, TraverseWithCallback) {
     touch(tmp_dir_ / "c.txt");
 
     std::vector<std::string> collected;
-    frappe::traverse_with(tmp_dir_,
-        [&](const frappe::file_entry& e) -> bool {
-            collected.push_back(e.name);
-            return true; // continue
-        });
+    frappe::traverse_with(tmp_dir_, [&](const frappe::file_entry &e) -> bool {
+        collected.push_back(e.name);
+        return true; // continue
+    });
     EXPECT_EQ(collected.size(), 3u);
 }
 
@@ -107,10 +107,9 @@ TEST_F(TraversalTest, TraverseWithCallbackEarlyStop) {
     }
 
     int count = 0;
-    frappe::traverse_with(tmp_dir_,
-        [&](const frappe::file_entry&) -> bool {
-            return ++count < 3; // stop after 3
-        });
+    frappe::traverse_with(tmp_dir_, [&](const frappe::file_entry &) -> bool {
+        return ++count < 3; // stop after 3
+    });
     EXPECT_EQ(count, 3);
 }
 
@@ -135,9 +134,10 @@ TEST_F(TraversalTest, DirectoryTraverserStats) {
     frappe::traversal_options opts;
     opts.include_hidden = true;
     frappe::directory_traverser traverser(tmp_dir_, opts);
-    for (auto it = traverser.begin(); it != traverser.end(); ++it) {}
+    for (auto it = traverser.begin(); it != traverser.end(); ++it) {
+    }
 
-    auto& stats = traverser.stats();
+    auto &stats = traverser.stats();
     // 3 files + 1 directory = 4 entries total
     EXPECT_GE(stats.files_visited + stats.dirs_visited, 4u);
     EXPECT_GE(stats.dirs_visited, 1u);
@@ -165,7 +165,7 @@ TEST_F(TraversalTest, SafeRecursiveIterator) {
     touch(tmp_dir_ / "sub" / "b.txt");
 
     int count = 0;
-    for (auto& entry : frappe::safe_recursive_directory(tmp_dir_)) {
+    for (auto &entry : frappe::safe_recursive_directory(tmp_dir_)) {
         (void)entry;
         ++count;
     }

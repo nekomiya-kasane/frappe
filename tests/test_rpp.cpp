@@ -1,11 +1,11 @@
-#include <gtest/gtest.h>
-#include <rpp/rpp.hpp>
-#include <vector>
-#include <string>
-#include <list>
 #include <deque>
-#include <set>
+#include <gtest/gtest.h>
+#include <list>
 #include <numeric>
+#include <rpp/rpp.hpp>
+#include <set>
+#include <string>
+#include <vector>
 
 // ============================================================================
 // Test data
@@ -16,18 +16,14 @@ struct Person {
     int age;
     std::string department;
     double salary;
-    
-    bool operator==(const Person& o) const = default;
+
+    bool operator==(const Person &o) const = default;
 };
 
 static std::vector<Person> people() {
     return {
-        {"Alice", 30, "Engineering", 80000},
-        {"Bob", 25, "Engineering", 70000},
-        {"Charlie", 35, "Sales", 60000},
-        {"Diana", 28, "Engineering", 75000},
-        {"Eve", 32, "Sales", 65000},
-        {"Frank", 40, "HR", 55000},
+        {"Alice", 30, "Engineering", 80000}, {"Bob", 25, "Engineering", 70000}, {"Charlie", 35, "Sales", 60000},
+        {"Diana", 28, "Engineering", 75000}, {"Eve", 32, "Sales", 65000},       {"Frank", 40, "HR", 55000},
         {"Grace", 27, "HR", 52000},
     };
 }
@@ -66,11 +62,7 @@ TEST(RppMaterialize, SortThenTakePipeline) {
 
 TEST(RppMaterialize, MaterializeThenContinue) {
     auto v = std::vector{5, 3, 1, 4, 2};
-    auto result = v 
-        | rpp::filter([](int x) { return x > 1; })
-        | rpp::materialize
-        | rpp::sort()
-        | rpp::to_vector;
+    auto result = v | rpp::filter([](int x) { return x > 1; }) | rpp::materialize | rpp::sort() | rpp::to_vector;
     EXPECT_EQ(result, (std::vector{2, 3, 4, 5}));
 }
 
@@ -85,9 +77,7 @@ TEST(RppFrom, FromLvalue) {
 }
 
 TEST(RppFrom, FromRvalue) {
-    auto result = rpp::from(std::vector{10, 20, 30}) 
-        | rpp::filter([](int x) { return x > 15; }) 
-        | rpp::to_vector;
+    auto result = rpp::from(std::vector{10, 20, 30}) | rpp::filter([](int x) { return x > 15; }) | rpp::to_vector;
     EXPECT_EQ(result, (std::vector{20, 30}));
 }
 
@@ -110,8 +100,7 @@ TEST(RppForEach, BasicForEach) {
 TEST(RppForEach, ForEachAfterFilter) {
     auto v = std::vector{1, 2, 3, 4, 5};
     std::vector<int> collected;
-    v | rpp::filter([](int x) { return x % 2 == 0; })
-      | rpp::for_each([&collected](int x) { collected.push_back(x); });
+    v | rpp::filter([](int x) { return x % 2 == 0; }) | rpp::for_each([&collected](int x) { collected.push_back(x); });
     EXPECT_EQ(collected, (std::vector{2, 4}));
 }
 
@@ -152,10 +141,8 @@ TEST(RppJoinStr, EmptyRange) {
 
 TEST(RppJoinStr, AfterPluck) {
     auto p = people();
-    auto result = p 
-        | rpp::filter([](const Person& p) { return p.department == "HR"; })
-        | rpp::pluck(&Person::name)
-        | rpp::join_str(" & ");
+    auto result = p | rpp::filter([](const Person &p) { return p.department == "HR"; }) | rpp::pluck(&Person::name) |
+                  rpp::join_str(" & ");
     EXPECT_EQ(result, "Frank & Grace");
 }
 
@@ -212,9 +199,7 @@ TEST(RppToUnorderedMap, IdentityValue) {
 // ============================================================================
 
 TEST(RppFormatTable, BasicTable) {
-    auto data = std::vector<std::tuple<std::string, int>>{
-        {"Alice", 30}, {"Bob", 25}
-    };
+    auto data = std::vector<std::tuple<std::string, int>>{{"Alice", 30}, {"Bob", 25}};
     auto table = data | rpp::format_table("Name", "Age");
     EXPECT_FALSE(table.empty());
     EXPECT_NE(table.find("Alice"), std::string::npos);
@@ -243,17 +228,13 @@ TEST(RppFormatTable, EmptyData) {
 
 TEST(RppGroupAggregate, SumByDepartment) {
     auto p = people();
-    auto result = p | rpp::group_aggregate(
-        &Person::department,
-        rpp::sum(&Person::salary),
-        rpp::count
-    );
-    
+    auto result = p | rpp::group_aggregate(&Person::department, rpp::sum(&Person::salary), rpp::count);
+
     // Result is vector<tuple<string, double, ptrdiff_t>>
     ASSERT_EQ(result.size(), 3u);
-    
+
     // Find Engineering group
-    for (const auto& [dept, total, cnt] : result) {
+    for (const auto &[dept, total, cnt] : result) {
         if (dept == "Engineering") {
             EXPECT_DOUBLE_EQ(total, 225000);
             EXPECT_EQ(cnt, 3);
@@ -269,12 +250,9 @@ TEST(RppGroupAggregate, SumByDepartment) {
 
 TEST(RppGroupAggregate, AvgByDepartment) {
     auto p = people();
-    auto result = p | rpp::group_aggregate(
-        &Person::department,
-        rpp::avg(&Person::salary)
-    );
-    
-    for (const auto& [dept, avg_sal] : result) {
+    auto result = p | rpp::group_aggregate(&Person::department, rpp::avg(&Person::salary));
+
+    for (const auto &[dept, avg_sal] : result) {
         if (dept == "Engineering") {
             EXPECT_NEAR(avg_sal, 75000, 1);
         }
@@ -287,13 +265,9 @@ TEST(RppGroupAggregate, AvgByDepartment) {
 
 TEST(RppHaving, FilterGroups) {
     auto p = people();
-    auto result = p | rpp::group_aggregate(
-        &Person::department,
-        rpp::count
-    ) | rpp::having([](const auto& row) {
-        return std::get<1>(row) > 2;
-    });
-    
+    auto result = p | rpp::group_aggregate(&Person::department, rpp::count) |
+                  rpp::having([](const auto &row) { return std::get<1>(row) > 2; });
+
     // Only Engineering has >2 members
     ASSERT_EQ(result.size(), 1u);
     EXPECT_EQ(std::get<0>(result[0]), "Engineering");
@@ -343,9 +317,9 @@ TEST(RppSlidingWindow, WindowSizeOne) {
 TEST(RppSlidingWindow, MovingAverage) {
     auto v = std::vector{1.0, 2.0, 3.0, 4.0, 5.0};
     auto windows = v | rpp::sliding_window(3);
-    
+
     std::vector<double> averages;
-    for (const auto& w : windows) {
+    for (const auto &w : windows) {
         double sum = 0;
         for (double x : w) sum += x;
         averages.push_back(sum / w.size());
@@ -362,25 +336,21 @@ TEST(RppSlidingWindow, MovingAverage) {
 
 TEST(RppWindow, LagOffset1) {
     auto v = std::vector{10, 20, 30, 40, 50};
-    auto result = v 
-        | rpp::window(std::identity{})
-            .select(rpp::window_fns::lag(std::identity{}, 1, 0));
-    
+    auto result = v | rpp::window(std::identity{}).select(rpp::window_fns::lag(std::identity{}, 1, 0));
+
     ASSERT_EQ(result.size(), 5u);
-    EXPECT_EQ(std::get<0>(result[0].second), 0);   // no prev
+    EXPECT_EQ(std::get<0>(result[0].second), 0); // no prev
     EXPECT_EQ(std::get<0>(result[1].second), 10);
     EXPECT_EQ(std::get<0>(result[2].second), 20);
 }
 
 TEST(RppWindow, LagOffset2) {
     auto v = std::vector{10, 20, 30, 40, 50};
-    auto result = v 
-        | rpp::window(std::identity{})
-            .select(rpp::window_fns::lag(std::identity{}, 2, -1));
-    
+    auto result = v | rpp::window(std::identity{}).select(rpp::window_fns::lag(std::identity{}, 2, -1));
+
     ASSERT_EQ(result.size(), 5u);
-    EXPECT_EQ(std::get<0>(result[0].second), -1);  // offset 2: no lag
-    EXPECT_EQ(std::get<0>(result[1].second), -1);  // offset 2: no lag
+    EXPECT_EQ(std::get<0>(result[0].second), -1); // offset 2: no lag
+    EXPECT_EQ(std::get<0>(result[1].second), -1); // offset 2: no lag
     EXPECT_EQ(std::get<0>(result[2].second), 10);
     EXPECT_EQ(std::get<0>(result[3].second), 20);
     EXPECT_EQ(std::get<0>(result[4].second), 30);
@@ -388,16 +358,14 @@ TEST(RppWindow, LagOffset2) {
 
 TEST(RppWindow, LeadOffset2) {
     auto v = std::vector{10, 20, 30, 40, 50};
-    auto result = v 
-        | rpp::window(std::identity{})
-            .select(rpp::window_fns::lead(std::identity{}, 2, -1));
-    
+    auto result = v | rpp::window(std::identity{}).select(rpp::window_fns::lead(std::identity{}, 2, -1));
+
     ASSERT_EQ(result.size(), 5u);
     EXPECT_EQ(std::get<0>(result[0].second), 30);
     EXPECT_EQ(std::get<0>(result[1].second), 40);
     EXPECT_EQ(std::get<0>(result[2].second), 50);
-    EXPECT_EQ(std::get<0>(result[3].second), -1);  // no lead
-    EXPECT_EQ(std::get<0>(result[4].second), -1);  // no lead
+    EXPECT_EQ(std::get<0>(result[3].second), -1); // no lead
+    EXPECT_EQ(std::get<0>(result[4].second), -1); // no lead
 }
 
 // ============================================================================
@@ -431,14 +399,13 @@ TEST(RppFilters, Eq) {
 TEST(RppFilters, Between) {
     auto p = people();
     auto result = p | rpp::filters::between(&Person::age, 28, 35) | rpp::to_vector;
-    // Alice(30), Diana(28), Charlie(35), Eve(32) 
+    // Alice(30), Diana(28), Charlie(35), Eve(32)
     EXPECT_EQ(result.size(), 4u);
 }
 
 TEST(RppFilters, In) {
     auto p = people();
-    auto result = p | rpp::filters::in(&Person::name, 
-        std::vector<std::string>{"Alice", "Bob"}) | rpp::to_vector;
+    auto result = p | rpp::filters::in(&Person::name, std::vector<std::string>{"Alice", "Bob"}) | rpp::to_vector;
     EXPECT_EQ(result.size(), 2u);
 }
 
@@ -471,10 +438,8 @@ TEST(RppSort, SortByDesc) {
 
 TEST(RppSort, MultiSort) {
     auto p = people();
-    auto result = p | rpp::multi_sort(
-        rpp::sort_by(&Person::department),
-        rpp::sort_by(&Person::salary).desc()
-    ) | rpp::to_vector;
+    auto result =
+        p | rpp::multi_sort(rpp::sort_by(&Person::department), rpp::sort_by(&Person::salary).desc()) | rpp::to_vector;
     // Engineering first (alpha), sorted by salary desc within
     EXPECT_EQ(result[0].department, "Engineering");
     EXPECT_EQ(result[0].name, "Alice");
@@ -523,14 +488,12 @@ TEST(RppSelect, Pluck) {
 
 TEST(RppSelect, CaseWhen) {
     auto p = people();
-    auto proj = rpp::case_when(
-        [](const Person& p) { return p.salary >= 70000; },
-        [](const Person&) { return std::string("High"); },
-        [](const Person&) { return std::string("Low"); }
-    );
+    auto proj = rpp::case_when([](const Person &p) { return p.salary >= 70000; },
+                               [](const Person &) { return std::string("High"); },
+                               [](const Person &) { return std::string("Low"); });
     auto result = p | rpp::pluck(proj) | rpp::to_vector;
-    EXPECT_EQ(result[0], "High");   // Alice: 80000
-    EXPECT_EQ(result[2], "Low");    // Charlie: 60000
+    EXPECT_EQ(result[0], "High"); // Alice: 80000
+    EXPECT_EQ(result[2], "Low");  // Charlie: 60000
 }
 
 TEST(RppDistinct, BasicDistinct) {
@@ -727,18 +690,17 @@ TEST(RppTransform, Map) {
 
 TEST(RppTransform, FlatMap) {
     auto v = std::vector{1, 2, 3};
-    auto result = v | rpp::flat_map([](int x) { 
-        return std::vector{x, x * 10}; 
-    }) | rpp::to_vector;
+    auto result = v | rpp::flat_map([](int x) { return std::vector{x, x * 10}; }) | rpp::to_vector;
     EXPECT_EQ(result, (std::vector{1, 10, 2, 20, 3, 30}));
 }
 
 TEST(RppTransform, FilterMap) {
     auto v = std::vector{1, 2, 3, 4, 5};
     auto result = v | rpp::filter_map([](int x) -> std::optional<int> {
-        if (x % 2 == 0) return x * 10;
-        return std::nullopt;
-    }) | rpp::to_vector;
+                      if (x % 2 == 0) return x * 10;
+                      return std::nullopt;
+                  }) |
+                  rpp::to_vector;
     EXPECT_EQ(result, (std::vector{20, 40}));
 }
 
@@ -758,24 +720,22 @@ TEST(RppTransform, Tap) {
 
 TEST(RppJoin, InnerJoin) {
     auto p = people();
-    struct Dept { std::string name; std::string loc; };
-    auto depts = std::vector<Dept>{
-        {"Engineering", "A"}, {"Sales", "B"}, {"HR", "C"}
+    struct Dept {
+        std::string name;
+        std::string loc;
     };
+    auto depts = std::vector<Dept>{{"Engineering", "A"}, {"Sales", "B"}, {"HR", "C"}};
     auto result = p | rpp::join(depts, &Person::department, &Dept::name);
     EXPECT_EQ(result.size(), 7u);
 }
 
 TEST(RppJoin, LeftJoin) {
-    auto p = std::vector<std::pair<int, std::string>>{
-        {1, "Alice"}, {2, "Bob"}, {3, "Charlie"}
-    };
+    auto p = std::vector<std::pair<int, std::string>>{{1, "Alice"}, {2, "Bob"}, {3, "Charlie"}};
     auto scores = std::vector<std::pair<int, int>>{{1, 90}, {3, 85}};
-    
-    auto result = p | rpp::left_join(scores,
-        [](const auto& p) { return p.first; },
-        [](const auto& s) { return s.first; });
-    
+
+    auto result =
+        p | rpp::left_join(scores, [](const auto &p) { return p.first; }, [](const auto &s) { return s.first; });
+
     EXPECT_EQ(result.size(), 3u);
 }
 
@@ -810,8 +770,7 @@ TEST(RppSetOps, SymmetricDifference) {
 
 TEST(RppWindow, RowNumber) {
     auto v = std::vector{30, 10, 20};
-    auto result = v | rpp::window(std::identity{})
-        .select(rpp::window_fns::row_number);
+    auto result = v | rpp::window(std::identity{}).select(rpp::window_fns::row_number);
     ASSERT_EQ(result.size(), 3u);
     // Ordered by identity: 10, 20, 30
     EXPECT_EQ(std::get<0>(result[0].second), 1u);
@@ -821,9 +780,8 @@ TEST(RppWindow, RowNumber) {
 
 TEST(RppWindow, RankWithTies) {
     auto v = std::vector{10, 20, 20, 30};
-    auto result = v | rpp::window(std::identity{})
-        .select(rpp::window_fns::rank, rpp::window_fns::dense_rank);
-    
+    auto result = v | rpp::window(std::identity{}).select(rpp::window_fns::rank, rpp::window_fns::dense_rank);
+
     // 10: rank=1,dense=1; 20: rank=2,dense=2; 20: rank=2,dense=2; 30: rank=4,dense=3
     EXPECT_EQ(std::get<0>(result[0].second), 1u);
     EXPECT_EQ(std::get<0>(result[3].second), 4u);
@@ -836,11 +794,9 @@ TEST(RppWindow, RankWithTies) {
 
 TEST(RppPipeline, FilterSortTake) {
     auto p = people();
-    auto result = p
-        | rpp::filter([](const Person& p) { return p.department == "Engineering"; })
-        | rpp::sort_by(&Person::salary).desc()
-        | rpp::to_vector;
-    
+    auto result = p | rpp::filter([](const Person &p) { return p.department == "Engineering"; }) |
+                  rpp::sort_by(&Person::salary).desc() | rpp::to_vector;
+
     ASSERT_EQ(result.size(), 3u);
     EXPECT_EQ(result[0].name, "Alice");
     EXPECT_EQ(result[1].name, "Diana");
@@ -849,31 +805,24 @@ TEST(RppPipeline, FilterSortTake) {
 
 TEST(RppPipeline, FilterSortSelectJoinStr) {
     auto p = people();
-    auto result = p
-        | rpp::filter([](const Person& p) { return p.salary >= 65000; })
-        | rpp::sort_by(&Person::salary).desc()
-        | rpp::pluck(&Person::name)
-        | rpp::join_str(", ");
-    
+    auto result = p | rpp::filter([](const Person &p) { return p.salary >= 65000; }) |
+                  rpp::sort_by(&Person::salary).desc() | rpp::pluck(&Person::name) | rpp::join_str(", ");
+
     EXPECT_EQ(result, "Alice, Diana, Bob, Eve");
 }
 
 TEST(RppPipeline, DistinctSortJoinStr) {
     auto v = std::vector<std::string>{"banana", "apple", "cherry", "apple", "banana"};
-    auto result = v 
-        | rpp::distinct() 
-        | rpp::sort()
-        | rpp::join_str(" | ");
+    auto result = v | rpp::distinct() | rpp::sort() | rpp::join_str(" | ");
     EXPECT_EQ(result, "apple | banana | cherry");
 }
 
 TEST(RppPipeline, GroupAggregateHavingSort) {
     auto p = people();
-    auto result = p
-        | rpp::group_aggregate(&Person::department, rpp::avg(&Person::salary))
-        | rpp::having([](const auto& row) { return std::get<1>(row) > 60000; })
-        | rpp::to_vector; // should be a no-op since having already returns vector
-    
+    auto result = p | rpp::group_aggregate(&Person::department, rpp::avg(&Person::salary)) |
+                  rpp::having([](const auto &row) { return std::get<1>(row) > 60000; }) |
+                  rpp::to_vector; // should be a no-op since having already returns vector
+
     // Only Engineering (75000 avg) qualifies, Sales is 62500
     // Actually: Engineering=75000, Sales=62500, HR=53500
     // >60000: Engineering, Sales
@@ -881,11 +830,8 @@ TEST(RppPipeline, GroupAggregateHavingSort) {
 }
 
 TEST(RppPipeline, FromRvalueFullPipeline) {
-    auto result = rpp::from(std::vector{5, 3, 1, 4, 2})
-        | rpp::filter([](int x) { return x > 2; })
-        | rpp::sort()
-        | rpp::map([](int x) { return x * 100; })
-        | rpp::to_vector;
+    auto result = rpp::from(std::vector{5, 3, 1, 4, 2}) | rpp::filter([](int x) { return x > 2; }) | rpp::sort() |
+                  rpp::map([](int x) { return x * 100; }) | rpp::to_vector;
     EXPECT_EQ(result, (std::vector{300, 400, 500}));
 }
 
@@ -897,7 +843,7 @@ TEST(RppOwningView, MoveSemantics) {
     auto v = std::vector{1, 2, 3};
     auto ov = rpp::owning_view<std::vector<int>>{std::move(v)};
     EXPECT_EQ(ov.size(), 3u);
-    
+
     auto ov2 = std::move(ov);
     EXPECT_EQ(ov2.size(), 3u);
     EXPECT_EQ(ov2[0], 1);
@@ -914,10 +860,7 @@ TEST(RppOwningView, CopySemantics) {
 }
 
 TEST(RppOwningView, PipelineContinuation) {
-    auto result = std::vector{5, 3, 1, 4, 2}
-        | rpp::sort()
-        | rpp::filter([](int x) { return x > 2; })
-        | rpp::to_vector;
+    auto result = std::vector{5, 3, 1, 4, 2} | rpp::sort() | rpp::filter([](int x) { return x > 2; }) | rpp::to_vector;
     EXPECT_EQ(result, (std::vector{3, 4, 5}));
 }
 
@@ -954,9 +897,8 @@ TEST(RppZipWith, EmptyRange) {
 
 TEST(RppEnumerateMap, Basic) {
     auto v = std::vector<std::string>{"a", "b", "c"};
-    auto result = v | rpp::enumerate_map([](std::size_t i, const std::string& s) {
-        return std::to_string(i) + ":" + s;
-    });
+    auto result =
+        v | rpp::enumerate_map([](std::size_t i, const std::string &s) { return std::to_string(i) + ":" + s; });
     EXPECT_EQ(result, (std::vector<std::string>{"0:a", "1:b", "2:c"}));
 }
 
@@ -972,28 +914,24 @@ TEST(RppEnumerateMap, Empty) {
 
 TEST(RppBatch, SumBatches) {
     auto v = std::vector{1, 2, 3, 4, 5, 6};
-    auto result = v | rpp::batch(3, [](const std::vector<int>& chunk) {
-        int s = 0;
-        for (int x : chunk) s += x;
-        return s;
-    });
+    auto result = v | rpp::batch(3, [](const std::vector<int> &chunk) {
+                      int s = 0;
+                      for (int x : chunk) s += x;
+                      return s;
+                  });
     EXPECT_EQ(result, (std::vector{6, 15}));
 }
 
 TEST(RppBatch, UnevenBatch) {
     auto v = std::vector{1, 2, 3, 4, 5};
-    auto result = v | rpp::batch(2, [](const std::vector<int>& chunk) {
-        return chunk.size();
-    });
+    auto result = v | rpp::batch(2, [](const std::vector<int> &chunk) { return chunk.size(); });
     // [1,2], [3,4], [5]
     EXPECT_EQ(result, (std::vector<std::size_t>{2u, 2u, 1u}));
 }
 
 TEST(RppBatch, EmptyRange) {
     auto v = std::vector<int>{};
-    auto result = v | rpp::batch(3, [](const std::vector<int>& chunk) {
-        return static_cast<int>(chunk.size());
-    });
+    auto result = v | rpp::batch(3, [](const std::vector<int> &chunk) { return static_cast<int>(chunk.size()); });
     EXPECT_TRUE(result.empty());
 }
 
@@ -1026,7 +964,7 @@ TEST(RppPairwise, Differences) {
     auto v = std::vector{10, 13, 17, 22};
     auto pairs = v | rpp::pairwise;
     std::vector<int> diffs;
-    for (auto& [a, b] : pairs) diffs.push_back(b - a);
+    for (auto &[a, b] : pairs) diffs.push_back(b - a);
     EXPECT_EQ(diffs, (std::vector{3, 4, 5}));
 }
 
@@ -1134,10 +1072,8 @@ TEST(RppIota, Empty) {
 }
 
 TEST(RppIota, PipelineCombination) {
-    auto result = rpp::iota(1, 11)
-        | rpp::filter([](int x) { return x % 2 == 0; })
-        | rpp::map([](int x) { return x * x; })
-        | rpp::to_vector;
+    auto result = rpp::iota(1, 11) | rpp::filter([](int x) { return x % 2 == 0; }) |
+                  rpp::map([](int x) { return x * x; }) | rpp::to_vector;
     EXPECT_EQ(result, (std::vector{4, 16, 36, 64, 100}));
 }
 
@@ -1166,17 +1102,13 @@ TEST(RppCache, Empty) {
 // ============================================================================
 
 TEST(RppPhase5Pipeline, IotaStrideMap) {
-    auto result = rpp::iota(0, 20)
-        | rpp::stride(3)
-        | rpp::map([](int x) { return x * 10; })
-        | rpp::to_vector;
+    auto result = rpp::iota(0, 20) | rpp::stride(3) | rpp::map([](int x) { return x * 10; }) | rpp::to_vector;
     // 0, 3, 6, 9, 12, 15, 18 -> *10
     EXPECT_EQ(result, (std::vector{0, 30, 60, 90, 120, 150, 180}));
 }
 
 TEST(RppPhase5Pipeline, GeneratePairwiseBatch) {
-    auto result = rpp::generate_n([](std::size_t i) { return static_cast<int>(i + 1); }, 5)
-        | rpp::pairwise;
+    auto result = rpp::generate_n([](std::size_t i) { return static_cast<int>(i + 1); }, 5) | rpp::pairwise;
     // [1,2,3,4,5] -> [(1,2),(2,3),(3,4),(4,5)]
     ASSERT_EQ(result.size(), 4u);
     EXPECT_EQ(result[0].first, 1);
@@ -1187,10 +1119,8 @@ TEST(RppPhase5Pipeline, GeneratePairwiseBatch) {
 
 TEST(RppPhase5Pipeline, TakeWhileDropWhile) {
     auto v = std::vector{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    auto result = v
-        | rpp::drop_while([](int x) { return x <= 3; })
-        | rpp::take_while([](int x) { return x <= 7; })
-        | rpp::to_vector;
+    auto result = v | rpp::drop_while([](int x) { return x <= 3; }) | rpp::take_while([](int x) { return x <= 7; }) |
+                  rpp::to_vector;
     EXPECT_EQ(result, (std::vector{4, 5, 6, 7}));
 }
 
@@ -1213,8 +1143,8 @@ TEST(RppEdge, SingleElement) {
     auto v = std::vector{42};
     EXPECT_EQ((v | rpp::to_vector), (std::vector{42}));
     EXPECT_EQ(v | rpp::sum(), 42);
-    EXPECT_EQ(*( v | rpp::first ), 42);
-    EXPECT_EQ(*( v | rpp::last ), 42);
+    EXPECT_EQ(*(v | rpp::first), 42);
+    EXPECT_EQ(*(v | rpp::last), 42);
     auto sorted = v | rpp::sort() | rpp::to_vector;
     EXPECT_EQ(sorted, (std::vector{42}));
 }
@@ -1222,11 +1152,8 @@ TEST(RppEdge, SingleElement) {
 TEST(RppEdge, LargeRange) {
     std::vector<int> v(10000);
     std::iota(v.begin(), v.end(), 0);
-    
-    auto result = v 
-        | rpp::filter([](int x) { return x % 100 == 0; })
-        | rpp::sort()
-        | rpp::to_vector;
+
+    auto result = v | rpp::filter([](int x) { return x % 100 == 0; }) | rpp::sort() | rpp::to_vector;
     EXPECT_EQ(result.size(), 100u);
     EXPECT_EQ(result[0], 0);
     EXPECT_EQ(result[99], 9900);

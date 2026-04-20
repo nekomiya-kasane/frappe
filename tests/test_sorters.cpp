@@ -1,12 +1,13 @@
-#include <gtest/gtest.h>
 #include "frappe/sorters.hpp"
+
+#include <gtest/gtest.h>
 #include <vector>
 
 using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string& name, std::uintmax_t size = 0) {
+file_entry make_entry(const std::string &name, std::uintmax_t size = 0) {
     file_entry e;
     e.file_path = name;
     e.name = name;
@@ -148,7 +149,7 @@ TEST(SortersTest, EmptyInput) {
 // ── Single element ──────────────────────────────────────────────────────
 
 TEST(SortersTest, SingleElement) {
-    std::vector<file_entry> entries = { make_entry("only.txt", 42) };
+    std::vector<file_entry> entries = {make_entry("only.txt", 42)};
     auto result = entries | entry::sort_by_size;
     ASSERT_EQ(result.size(), 1u);
     EXPECT_EQ(result[0].name, "only.txt");

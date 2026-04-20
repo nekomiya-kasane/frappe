@@ -1,10 +1,11 @@
-#include <gtest/gtest.h>
 #include "frappe/filesystem.hpp"
+
 #include <filesystem>
 #include <fstream>
+#include <gtest/gtest.h>
 
 class FilesystemTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         _test_dir = std::filesystem::temp_directory_path() / "frappe_filesystem_test";
         std::filesystem::create_directories(_test_dir);
@@ -92,7 +93,7 @@ TEST_F(FilesystemTest, ListVolumes) {
     EXPECT_TRUE(volumes.has_value());
     EXPECT_GT(volumes->size(), 0u);
 
-    for (const auto& vol : *volumes) {
+    for (const auto &vol : *volumes) {
         EXPECT_FALSE(vol.mount_point.empty());
     }
 }
@@ -207,7 +208,7 @@ TEST_F(FilesystemTest, ListNfsMounts) {
 TEST_F(FilesystemTest, IsShareAvailable) {
     const auto available = frappe::is_share_available(_test_dir);
     EXPECT_TRUE(available.has_value());
-    EXPECT_TRUE(*available);  // Test dir should exist
+    EXPECT_TRUE(*available); // Test dir should exist
 }
 
 TEST_F(FilesystemTest, GetServerInfo) {
@@ -345,7 +346,7 @@ TEST_F(FilesystemTest, IsVirtualFilesystem) {
 TEST_F(FilesystemTest, IsFuseMount) {
     const auto is_fuse = frappe::is_fuse_mount(_test_dir);
     EXPECT_TRUE(is_fuse.has_value());
-    EXPECT_FALSE(*is_fuse);  // Test path should not be FUSE
+    EXPECT_FALSE(*is_fuse); // Test path should not be FUSE
 }
 
 TEST_F(FilesystemTest, IsEncryptedMount) {
@@ -368,7 +369,7 @@ TEST_F(FilesystemTest, ListAllMounts) {
     EXPECT_GT(mounts->size(), 0u);
 
     // Every mount should have a path
-    for (const auto& m : *mounts) {
+    for (const auto &m : *mounts) {
         EXPECT_FALSE(m.mount_path.empty());
     }
 }
@@ -377,7 +378,7 @@ TEST_F(FilesystemTest, ListLocalMounts) {
     const auto mounts = frappe::list_local_mounts();
     EXPECT_TRUE(mounts.has_value());
 
-    for (const auto& m : *mounts) {
+    for (const auto &m : *mounts) {
         EXPECT_EQ(m.storage_type, frappe::storage_location_type::local);
     }
 }

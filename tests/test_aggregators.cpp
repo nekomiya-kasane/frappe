@@ -1,12 +1,13 @@
-#include <gtest/gtest.h>
 #include "frappe/aggregators.hpp"
+
+#include <gtest/gtest.h>
 #include <vector>
 
 using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string& name, std::uintmax_t size = 0) {
+file_entry make_entry(const std::string &name, std::uintmax_t size = 0) {
     file_entry e;
     e.file_path = name;
     e.name = name;
@@ -20,11 +21,8 @@ file_entry make_entry(const std::string& name, std::uintmax_t size = 0) {
 
 std::vector<file_entry> sample() {
     return {
-        make_entry("a.cpp", 100),
-        make_entry("b.cpp", 200),
-        make_entry("c.hpp", 300),
-        make_entry("d.hpp", 400),
-        make_entry("e.txt", 500),
+        make_entry("a.cpp", 100), make_entry("b.cpp", 200), make_entry("c.hpp", 300),
+        make_entry("d.hpp", 400), make_entry("e.txt", 500),
     };
 }
 
@@ -92,7 +90,7 @@ TEST(AggregatorsTest, Count) {
 
 TEST(AggregatorsTest, CountIf) {
     auto entries = sample();
-    auto n = entries | count_if([](const file_entry& e) { return e.size > 200; });
+    auto n = entries | count_if([](const file_entry &e) { return e.size > 200; });
     EXPECT_EQ(n, 3u);
 }
 
@@ -160,8 +158,8 @@ TEST(AggregatorsTest, CountByExtension) {
 TEST(AggregatorsTest, SumByExtension) {
     auto entries = sample();
     auto sums = entries | sum_by(proj::extension, proj::size);
-    EXPECT_EQ(sums[".cpp"], 300u);  // 100+200
-    EXPECT_EQ(sums[".hpp"], 700u);  // 300+400
+    EXPECT_EQ(sums[".cpp"], 300u); // 100+200
+    EXPECT_EQ(sums[".hpp"], 700u); // 300+400
     EXPECT_EQ(sums[".txt"], 500u);
 }
 
@@ -169,7 +167,7 @@ TEST(AggregatorsTest, SumByExtension) {
 
 TEST(AggregatorsTest, PartitionBy) {
     auto entries = sample();
-    auto [big, small_] = entries | partition_by([](const file_entry& e) { return e.size > 250; });
+    auto [big, small_] = entries | partition_by([](const file_entry &e) { return e.size > 250; });
     EXPECT_EQ(big.size(), 3u);
     EXPECT_EQ(small_.size(), 2u);
 }
@@ -222,20 +220,20 @@ TEST(AggregatorsTest, NthOutOfRange) {
 
 TEST(AggregatorsTest, AnyOf) {
     auto entries = sample();
-    EXPECT_TRUE(entries | any_of([](const file_entry& e) { return e.size == 500; }));
-    EXPECT_FALSE(entries | any_of([](const file_entry& e) { return e.size == 999; }));
+    EXPECT_TRUE(entries | any_of([](const file_entry &e) { return e.size == 500; }));
+    EXPECT_FALSE(entries | any_of([](const file_entry &e) { return e.size == 999; }));
 }
 
 TEST(AggregatorsTest, AllOf) {
     auto entries = sample();
-    EXPECT_TRUE(entries | all_of([](const file_entry& e) { return e.size > 0; }));
-    EXPECT_FALSE(entries | all_of([](const file_entry& e) { return e.size > 200; }));
+    EXPECT_TRUE(entries | all_of([](const file_entry &e) { return e.size > 0; }));
+    EXPECT_FALSE(entries | all_of([](const file_entry &e) { return e.size > 200; }));
 }
 
 TEST(AggregatorsTest, NoneOf) {
     auto entries = sample();
-    EXPECT_TRUE(entries | none_of([](const file_entry& e) { return e.size > 1000; }));
-    EXPECT_FALSE(entries | none_of([](const file_entry& e) { return e.size > 400; }));
+    EXPECT_TRUE(entries | none_of([](const file_entry &e) { return e.size > 1000; }));
+    EXPECT_FALSE(entries | none_of([](const file_entry &e) { return e.size > 400; }));
 }
 
 // ── Dedup ───────────────────────────────────────────────────────────────
@@ -254,7 +252,7 @@ TEST(AggregatorsTest, DedupByExtension) {
 
 TEST(AggregatorsTest, TakeWhile) {
     auto entries = sample();
-    auto result = entries | take_while([](const file_entry& e) { return e.size < 300; });
+    auto result = entries | take_while([](const file_entry &e) { return e.size < 300; });
     ASSERT_EQ(result.size(), 2u);
     EXPECT_EQ(result[0].name, "a.cpp");
     EXPECT_EQ(result[1].name, "b.cpp");
@@ -262,7 +260,7 @@ TEST(AggregatorsTest, TakeWhile) {
 
 TEST(AggregatorsTest, DropWhile) {
     auto entries = sample();
-    auto result = entries | drop_while([](const file_entry& e) { return e.size < 300; });
+    auto result = entries | drop_while([](const file_entry &e) { return e.size < 300; });
     ASSERT_EQ(result.size(), 3u);
     EXPECT_EQ(result[0].name, "c.hpp");
 }
@@ -271,7 +269,7 @@ TEST(AggregatorsTest, DropWhile) {
 
 TEST(AggregatorsTest, Collect) {
     auto entries = sample();
-    auto view = entries | std::views::filter([](const file_entry& e) { return e.size > 200; });
+    auto view = entries | std::views::filter([](const file_entry &e) { return e.size > 200; });
     auto result = view | collect;
     EXPECT_EQ(result.size(), 3u);
 }

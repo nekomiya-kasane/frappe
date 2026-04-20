@@ -1,14 +1,14 @@
-#include <gtest/gtest.h>
 #include "frappe/filters.hpp"
-#include <vector>
+
+#include <gtest/gtest.h>
 #include <ranges>
+#include <vector>
 
 using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string& name, file_type type,
-                      std::uintmax_t size = 0, bool hidden = false) {
+file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0, bool hidden = false) {
     file_entry e;
     e.file_path = name;
     e.name = name;
@@ -24,12 +24,9 @@ file_entry make_entry(const std::string& name, file_type type,
 
 std::vector<file_entry> sample_entries() {
     return {
-        make_entry("readme.md", file_type::regular, 1024),
-        make_entry("main.cpp", file_type::regular, 4096),
-        make_entry("build", file_type::directory, 0),
-        make_entry(".gitignore", file_type::regular, 256, true),
-        make_entry("lib.hpp", file_type::regular, 2048),
-        make_entry("empty.txt", file_type::regular, 0),
+        make_entry("readme.md", file_type::regular, 1024), make_entry("main.cpp", file_type::regular, 4096),
+        make_entry("build", file_type::directory, 0),      make_entry(".gitignore", file_type::regular, 256, true),
+        make_entry("lib.hpp", file_type::regular, 2048),   make_entry("empty.txt", file_type::regular, 0),
     };
 }
 

@@ -1,26 +1,27 @@
-#include <gtest/gtest.h>
 #include "frappe/permissions.hpp"
+
 #include <filesystem>
 #include <fstream>
+#include <gtest/gtest.h>
 
 class PermissionsTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         _test_dir = std::filesystem::temp_directory_path() / "frappe_permissions_test";
         std::filesystem::create_directories(_test_dir);
-        
+
         _test_file = _test_dir / "test_file.txt";
         std::ofstream(_test_file) << "test content";
-        
+
         _test_subdir = _test_dir / "subdir";
         std::filesystem::create_directories(_test_subdir);
     }
-    
+
     void TearDown() override {
         std::error_code ec;
         std::filesystem::remove_all(_test_dir, ec);
     }
-    
+
     std::filesystem::path _test_dir;
     std::filesystem::path _test_file;
     std::filesystem::path _test_subdir;
@@ -49,10 +50,8 @@ TEST_F(PermissionsTest, IsWritable) {
 
 TEST_F(PermissionsTest, PermissionsToString) {
     auto str = frappe::permissions_to_string(
-        frappe::perms::owner_read | frappe::perms::owner_write | frappe::perms::owner_exec |
-        frappe::perms::group_read | frappe::perms::group_exec |
-        frappe::perms::others_read | frappe::perms::others_exec
-    );
+        frappe::perms::owner_read | frappe::perms::owner_write | frappe::perms::owner_exec | frappe::perms::group_read |
+        frappe::perms::group_exec | frappe::perms::others_read | frappe::perms::others_exec);
     EXPECT_EQ(str, "rwxr-xr-x");
 }
 
@@ -63,10 +62,8 @@ TEST_F(PermissionsTest, PermissionsToStringAllDash) {
 
 TEST_F(PermissionsTest, PermissionsToOctal) {
     auto octal = frappe::permissions_to_octal(
-        frappe::perms::owner_read | frappe::perms::owner_write | frappe::perms::owner_exec |
-        frappe::perms::group_read | frappe::perms::group_exec |
-        frappe::perms::others_read | frappe::perms::others_exec
-    );
+        frappe::perms::owner_read | frappe::perms::owner_write | frappe::perms::owner_exec | frappe::perms::group_read |
+        frappe::perms::group_exec | frappe::perms::others_read | frappe::perms::others_exec);
     EXPECT_EQ(octal, "0755");
 }
 
@@ -124,21 +121,21 @@ TEST_F(PermissionsTest, AccessRightsOperators) {
 }
 
 TEST_F(PermissionsTest, PermissionsStringRoundTrip) {
-    auto original = frappe::perms::owner_read | frappe::perms::owner_write | 
-                    frappe::perms::group_read | frappe::perms::others_read;
+    auto original =
+        frappe::perms::owner_read | frappe::perms::owner_write | frappe::perms::group_read | frappe::perms::others_read;
     auto str = frappe::permissions_to_string(original);
     auto parsed = frappe::permissions_from_string(str);
-    
+
     EXPECT_EQ((original & frappe::perms::mask), (parsed & frappe::perms::mask));
 }
 
 TEST_F(PermissionsTest, PermissionsOctalRoundTrip) {
     auto original = frappe::perms::owner_read | frappe::perms::owner_write | frappe::perms::owner_exec |
-                    frappe::perms::group_read | frappe::perms::group_exec |
-                    frappe::perms::others_read | frappe::perms::others_exec;
+                    frappe::perms::group_read | frappe::perms::group_exec | frappe::perms::others_read |
+                    frappe::perms::others_exec;
     auto octal = frappe::permissions_to_octal(original);
     auto parsed = frappe::permissions_from_octal(octal);
-    
+
     EXPECT_EQ((original & frappe::perms::mask), (parsed & frappe::perms::mask));
 }
 
@@ -191,7 +188,7 @@ TEST_F(PermissionsTest, AclToString) {
     entry.write = true;
     entry.execute = false;
     acl.entries.push_back(entry);
-    
+
     auto str = frappe::acl_to_string(acl);
     EXPECT_FALSE(str.empty());
     EXPECT_NE(str.find("user::"), std::string::npos);
@@ -209,13 +206,13 @@ TEST_F(PermissionsTest, GetWinAttributes) {
 TEST_F(PermissionsTest, IsReadonly) {
     auto readonly = frappe::is_readonly(_test_file);
     EXPECT_TRUE(readonly.has_value());
-    EXPECT_FALSE(*readonly);  // New file should not be readonly
+    EXPECT_FALSE(*readonly); // New file should not be readonly
 }
 
 TEST_F(PermissionsTest, IsHidden) {
     auto hidden = frappe::is_hidden(_test_file);
     EXPECT_TRUE(hidden.has_value());
-    EXPECT_FALSE(*hidden);  // New file should not be hidden
+    EXPECT_FALSE(*hidden); // New file should not be hidden
 }
 
 TEST_F(PermissionsTest, IsArchive) {
@@ -228,10 +225,10 @@ TEST_F(PermissionsTest, IsArchive) {
 TEST_F(PermissionsTest, SetReadonly) {
     auto result = frappe::set_readonly(_test_file, true);
     EXPECT_TRUE(result.has_value());
-    
+
     auto readonly = frappe::is_readonly(_test_file);
     EXPECT_TRUE(readonly.has_value() && *readonly);
-    
+
     // Reset
     frappe::set_readonly(_test_file, false);
 }
@@ -239,10 +236,10 @@ TEST_F(PermissionsTest, SetReadonly) {
 TEST_F(PermissionsTest, SetHidden) {
     auto result = frappe::set_hidden(_test_file, true);
     EXPECT_TRUE(result.has_value());
-    
+
     auto hidden = frappe::is_hidden(_test_file);
     EXPECT_TRUE(hidden.has_value() && *hidden);
-    
+
     // Reset
     frappe::set_hidden(_test_file, false);
 }
@@ -309,7 +306,7 @@ TEST_F(PermissionsTest, GetAccountFromSid) {
     auto current = frappe::current_user_name();
     auto sid = frappe::get_sid(current);
     ASSERT_TRUE(sid.has_value());
-    
+
     // Now look up account from SID string
     auto account = frappe::get_account_from_sid(sid->sid_string);
     EXPECT_TRUE(account.has_value());
@@ -327,7 +324,7 @@ TEST_F(PermissionsTest, WellKnownSids) {
     auto everyone = frappe::get_account_from_sid(std::string(frappe::well_known_sid::everyone));
     EXPECT_TRUE(everyone.has_value());
     EXPECT_EQ(everyone->type, frappe::sid_type::well_known_group);
-    
+
     auto system = frappe::get_account_from_sid(std::string(frappe::well_known_sid::local_system));
     EXPECT_TRUE(system.has_value());
 }
@@ -348,11 +345,11 @@ TEST_F(PermissionsTest, GetLocalUsers) {
     auto users = frappe::get_local_users();
     EXPECT_TRUE(users.has_value());
     EXPECT_GT(users->size(), 0u);
-    
+
     // Current user should be in the list
     auto current = frappe::current_user_name();
     bool found = false;
-    for (const auto& u : *users) {
+    for (const auto &u : *users) {
         if (u == current) {
             found = true;
             break;
@@ -370,7 +367,7 @@ TEST_F(PermissionsTest, GetLocalGroups) {
 TEST_F(PermissionsTest, LookupAccount) {
     auto current = frappe::current_user_name();
     auto computer = frappe::get_computer_name();
-    
+
     auto sid = frappe::lookup_account(computer, current);
     EXPECT_TRUE(sid.has_value());
     EXPECT_EQ(sid->account_name, current);

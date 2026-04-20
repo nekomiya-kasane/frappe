@@ -1,6 +1,7 @@
-#include <gtest/gtest.h>
 #include "frappe/path.hpp"
+
 #include <filesystem>
+#include <gtest/gtest.h>
 
 TEST(PathTest, HomePath) {
     auto home = frappe::home_path();

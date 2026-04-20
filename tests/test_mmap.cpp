@@ -1,13 +1,14 @@
-#include <gtest/gtest.h>
 #include "frappe/mmap.hpp"
+
+#include <cstring>
 #include <filesystem>
 #include <fstream>
-#include <cstring>
+#include <gtest/gtest.h>
 
 namespace fs = std::filesystem;
 
 class MmapTest : public ::testing::Test {
-protected:
+  protected:
     fs::path tmp_dir_;
 
     void SetUp() override {
@@ -20,14 +21,14 @@ protected:
         fs::remove_all(tmp_dir_, ec);
     }
 
-    fs::path make_file(const std::string& name, const std::string& content) {
+    fs::path make_file(const std::string &name, const std::string &content) {
         auto p = tmp_dir_ / name;
         std::ofstream f(p, std::ios::binary);
         f.write(content.data(), content.size());
         return p;
     }
 
-    fs::path make_binary_file(const std::string& name, size_t size, uint8_t seed = 0) {
+    fs::path make_binary_file(const std::string &name, size_t size, uint8_t seed = 0) {
         auto p = tmp_dir_ / name;
         std::ofstream f(p, std::ios::binary);
         for (size_t i = 0; i < size; ++i) {
@@ -42,7 +43,7 @@ TEST_F(MmapTest, OpenReadOnly) {
     auto p = make_file("read.txt", "Hello, mmap!");
     auto result = frappe::mapped_file::open(p, frappe::map_mode::read_only);
     ASSERT_TRUE(result.has_value()) << result.error().message();
-    auto& mf = *result;
+    auto &mf = *result;
     EXPECT_TRUE(mf.is_open());
     EXPECT_EQ(mf.size(), 12u);
     EXPECT_EQ(mf.as_string(), "Hello, mmap!");
@@ -69,10 +70,10 @@ TEST_F(MmapTest, ReadWriteMode) {
     {
         auto result = frappe::mapped_file::open(p, frappe::map_mode::read_write);
         ASSERT_TRUE(result.has_value()) << result.error().message();
-        auto& mf = *result;
+        auto &mf = *result;
         EXPECT_EQ(mf.size(), 8u);
         // Modify through mapping
-        auto* ptr = mf.data();
+        auto *ptr = mf.data();
         ASSERT_NE(ptr, nullptr);
         ptr[0] = std::byte{'X'};
         ptr[7] = std::byte{'Y'};
@@ -159,7 +160,7 @@ TEST_F(MmapTest, LargerFile) {
     EXPECT_EQ(result->size(), 100000u);
 
     // Verify content
-    auto* data = reinterpret_cast<const uint8_t*>(result->data());
+    auto *data = reinterpret_cast<const uint8_t *>(result->data());
     for (size_t i = 0; i < 100; ++i) {
         EXPECT_EQ(data[i], static_cast<uint8_t>((i + 0x42) & 0xFF));
     }

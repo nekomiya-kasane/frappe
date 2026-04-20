@@ -1,11 +1,11 @@
 #ifndef FRAPPE_VERSION_HPP
 #define FRAPPE_VERSION_HPP
 
+#include "frappe/exports.hpp"
+
 #include <cstdint>
 #include <string>
 #include <string_view>
-
-#include "frappe/exports.hpp"
 
 #ifndef FRAPPE_VERSION_MAJOR
 #define FRAPPE_VERSION_MAJOR 0

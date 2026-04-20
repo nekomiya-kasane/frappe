@@ -1,13 +1,13 @@
-#include <gtest/gtest.h>
 #include "frappe/projections.hpp"
+
+#include <gtest/gtest.h>
 #include <vector>
 
 using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string& name, file_type type,
-                      std::uintmax_t size = 0, bool hidden = false) {
+file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0, bool hidden = false) {
     file_entry e;
     e.file_path = "/tmp/" + name;
     e.name = name;

@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include "frappe/version.hpp"
+
+#include <gtest/gtest.h>
 
 TEST(VersionTest, MajorMinorPatch) {
     EXPECT_GE(frappe::version::major, 0u);
@@ -9,9 +10,7 @@ TEST(VersionTest, MajorMinorPatch) {
 
 TEST(VersionTest, Number) {
     auto num = frappe::version::number();
-    EXPECT_EQ(num, frappe::version::major * 10000 + 
-                   frappe::version::minor * 100 + 
-                   frappe::version::patch);
+    EXPECT_EQ(num, frappe::version::major * 10000 + frappe::version::minor * 100 + frappe::version::patch);
 }
 
 TEST(VersionTest, String) {

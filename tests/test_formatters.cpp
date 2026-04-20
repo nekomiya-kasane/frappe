@@ -1,13 +1,13 @@
-#include <gtest/gtest.h>
 #include "frappe/formatters.hpp"
+
 #include <format>
+#include <gtest/gtest.h>
 
 using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string& name, file_type type,
-                      std::uintmax_t size = 0) {
+file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0) {
     file_entry e;
     e.file_path = "/tmp/" + name;
     e.name = name;
@@ -222,11 +222,11 @@ TEST(FormattersTest, FileEntryLinkCount) {
 TEST(FormattersTest, FileEntryAclIndicator) {
     auto e = make_entry("test.txt", file_type::regular);
     auto s = std::format("{:+}", e);
-    EXPECT_EQ(s, " ");  // has_acl = false
+    EXPECT_EQ(s, " "); // has_acl = false
 }
 
 TEST(FormattersTest, FileEntryXattrIndicator) {
     auto e = make_entry("test.txt", file_type::regular);
     auto s = std::format("{:@}", e);
-    EXPECT_EQ(s, "@");  // has_xattr = true
+    EXPECT_EQ(s, "@"); // has_xattr = true
 }

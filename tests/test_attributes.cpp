@@ -1,37 +1,38 @@
-#include <gtest/gtest.h>
 #include "frappe/attributes.hpp"
+
 #include <filesystem>
 #include <fstream>
+#include <gtest/gtest.h>
 
 class AttributesTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         _test_dir = std::filesystem::temp_directory_path() / "frappe_attributes_test";
         std::filesystem::create_directories(_test_dir);
-        
+
         _test_file = _test_dir / "test_file.txt";
         std::ofstream(_test_file) << "test content for attributes";
-        
+
         _png_file = _test_dir / "test.png";
         std::ofstream png_ofs(_png_file, std::ios::binary);
         unsigned char png_header[] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
-        png_ofs.write(reinterpret_cast<char*>(png_header), sizeof(png_header));
-        
+        png_ofs.write(reinterpret_cast<char *>(png_header), sizeof(png_header));
+
         _zip_file = _test_dir / "test.zip";
         std::ofstream zip_ofs(_zip_file, std::ios::binary);
         unsigned char zip_header[] = {0x50, 0x4B, 0x03, 0x04};
-        zip_ofs.write(reinterpret_cast<char*>(zip_header), sizeof(zip_header));
-        
+        zip_ofs.write(reinterpret_cast<char *>(zip_header), sizeof(zip_header));
+
         _pdf_file = _test_dir / "test.pdf";
         std::ofstream pdf_ofs(_pdf_file, std::ios::binary);
         pdf_ofs << "%PDF-1.4";
     }
-    
+
     void TearDown() override {
         std::error_code ec;
         std::filesystem::remove_all(_test_dir, ec);
     }
-    
+
     std::filesystem::path _test_dir;
     std::filesystem::path _test_file;
     std::filesystem::path _png_file;
@@ -161,27 +162,27 @@ TEST_F(AttributesTest, SetAndGetXattr) {
     if (!supported || !*supported) {
         GTEST_SKIP() << "xattr not supported on this filesystem";
     }
-    
+
     std::string test_value = "test_xattr_value";
     auto set_result = frappe::set_xattr(_test_file, "test_attr", test_value);
     if (!set_result) {
         GTEST_SKIP() << "Failed to set xattr";
     }
-    
+
     auto has_result = frappe::has_xattr(_test_file, "test_attr");
     EXPECT_TRUE(has_result.has_value() && *has_result);
-    
+
     auto value = frappe::get_xattr_string(_test_file, "test_attr");
     EXPECT_TRUE(value.has_value());
     EXPECT_EQ(*value, test_value);
-    
+
     auto attrs = frappe::list_xattr(_test_file);
     EXPECT_TRUE(attrs.has_value());
     EXPECT_FALSE(attrs->empty());
-    
+
     auto remove_result = frappe::remove_xattr(_test_file, "test_attr");
     EXPECT_TRUE(remove_result.has_value());
-    
+
     auto has_after = frappe::has_xattr(_test_file, "test_attr");
     EXPECT_TRUE(has_after.has_value() && !*has_after);
 }
@@ -241,12 +242,12 @@ TEST_F(AttributesTest, MimeTypeFromContentData) {
     std::vector<std::uint8_t> png_data = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
     auto mime = frappe::mime_type_from_content(png_data);
     EXPECT_EQ(mime, "image/png");
-    
+
     // JPEG magic bytes
     std::vector<std::uint8_t> jpg_data = {0xFF, 0xD8, 0xFF, 0xE0};
     mime = frappe::mime_type_from_content(jpg_data);
     EXPECT_EQ(mime, "image/jpeg");
-    
+
     // Unknown data
     std::vector<std::uint8_t> unknown_data = {0x00, 0x01, 0x02, 0x03};
     mime = frappe::mime_type_from_content(unknown_data);

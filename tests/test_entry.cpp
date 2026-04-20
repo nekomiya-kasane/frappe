@@ -1,7 +1,8 @@
-#include <gtest/gtest.h>
 #include "frappe/entry.hpp"
+
 #include <filesystem>
 #include <fstream>
+#include <gtest/gtest.h>
 #include <set>
 #ifdef _WIN32
 #include <windows.h>
@@ -10,7 +11,7 @@
 using namespace frappe;
 
 class EntryTest : public ::testing::Test {
-protected:
+  protected:
     std::filesystem::path tmp_dir_;
 
     void SetUp() override {
@@ -24,7 +25,7 @@ protected:
         std::filesystem::remove_all(tmp_dir_, ec);
     }
 
-    void touch(const std::filesystem::path& p, const std::string& content = "") {
+    void touch(const std::filesystem::path &p, const std::string &content = "") {
         std::ofstream ofs(p);
         if (!content.empty()) ofs << content;
     }
@@ -38,7 +39,7 @@ TEST_F(EntryTest, GetFileEntryRegularFile) {
 
     auto result = get_file_entry(f);
     ASSERT_TRUE(result.has_value()) << "get_file_entry failed";
-    auto& e = result.value();
+    auto &e = result.value();
 
     EXPECT_EQ(e.name, "hello.txt");
     EXPECT_EQ(e.stem, "hello");
@@ -54,7 +55,7 @@ TEST_F(EntryTest, GetFileEntryDirectory) {
 
     auto result = get_file_entry(d);
     ASSERT_TRUE(result.has_value());
-    auto& e = result.value();
+    auto &e = result.value();
 
     EXPECT_EQ(e.name, "subdir");
     EXPECT_EQ(e.type, file_type::directory);
@@ -81,8 +82,7 @@ TEST_F(EntryTest, GetFileEntryPathPreserved) {
 
     auto result = get_file_entry(f);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(std::filesystem::canonical(result->file_path),
-              std::filesystem::canonical(f));
+    EXPECT_EQ(std::filesystem::canonical(result->file_path), std::filesystem::canonical(f));
 }
 
 // ── get_file_entry(directory_entry) ─────────────────────────────────────
@@ -110,7 +110,7 @@ TEST_F(EntryTest, ListEntriesFlat) {
     EXPECT_EQ(entries.size(), 3u);
 
     std::set<std::string> names;
-    for (auto& e : entries) names.insert(e.name);
+    for (auto &e : entries) names.insert(e.name);
     EXPECT_TRUE(names.count("a.txt"));
     EXPECT_TRUE(names.count("b.txt"));
     EXPECT_TRUE(names.count("c.txt"));
@@ -151,7 +151,7 @@ TEST_F(EntryTest, ListEntriesRecursive) {
     EXPECT_GE(entries.size(), 3u);
 
     std::set<std::string> names;
-    for (auto& e : entries) names.insert(e.name);
+    for (auto &e : entries) names.insert(e.name);
     EXPECT_TRUE(names.count("top.txt"));
     EXPECT_TRUE(names.count("nested.txt"));
     EXPECT_TRUE(names.count("sub"));
