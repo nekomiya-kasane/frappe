@@ -80,7 +80,9 @@ enum class size_unit {
             size /= 1000.0;
             ++i;
         }
-        if (i == 0) oss << std::setprecision(0);
+        if (i == 0) {
+            oss << std::setprecision(0);
+        }
         oss << size << " " << units[i];
         break;
     }
@@ -93,7 +95,9 @@ enum class size_unit {
             size /= 1024.0;
             ++i;
         }
-        if (i == 0) oss << std::setprecision(0);
+        if (i == 0) {
+            oss << std::setprecision(0);
+        }
         oss << size << units[i];
         break;
     }
@@ -230,18 +234,42 @@ enum class size_unit {
 
 [[nodiscard]] inline std::string format_permissions_octal(std::filesystem::perms p) {
     unsigned mode = 0;
-    if ((p & std::filesystem::perms::owner_read) != std::filesystem::perms::none) mode |= 0400;
-    if ((p & std::filesystem::perms::owner_write) != std::filesystem::perms::none) mode |= 0200;
-    if ((p & std::filesystem::perms::owner_exec) != std::filesystem::perms::none) mode |= 0100;
-    if ((p & std::filesystem::perms::group_read) != std::filesystem::perms::none) mode |= 0040;
-    if ((p & std::filesystem::perms::group_write) != std::filesystem::perms::none) mode |= 0020;
-    if ((p & std::filesystem::perms::group_exec) != std::filesystem::perms::none) mode |= 0010;
-    if ((p & std::filesystem::perms::others_read) != std::filesystem::perms::none) mode |= 0004;
-    if ((p & std::filesystem::perms::others_write) != std::filesystem::perms::none) mode |= 0002;
-    if ((p & std::filesystem::perms::others_exec) != std::filesystem::perms::none) mode |= 0001;
-    if ((p & std::filesystem::perms::set_uid) != std::filesystem::perms::none) mode |= 04000;
-    if ((p & std::filesystem::perms::set_gid) != std::filesystem::perms::none) mode |= 02000;
-    if ((p & std::filesystem::perms::sticky_bit) != std::filesystem::perms::none) mode |= 01000;
+    if ((p & std::filesystem::perms::owner_read) != std::filesystem::perms::none) {
+        mode |= 0400;
+    }
+    if ((p & std::filesystem::perms::owner_write) != std::filesystem::perms::none) {
+        mode |= 0200;
+    }
+    if ((p & std::filesystem::perms::owner_exec) != std::filesystem::perms::none) {
+        mode |= 0100;
+    }
+    if ((p & std::filesystem::perms::group_read) != std::filesystem::perms::none) {
+        mode |= 0040;
+    }
+    if ((p & std::filesystem::perms::group_write) != std::filesystem::perms::none) {
+        mode |= 0020;
+    }
+    if ((p & std::filesystem::perms::group_exec) != std::filesystem::perms::none) {
+        mode |= 0010;
+    }
+    if ((p & std::filesystem::perms::others_read) != std::filesystem::perms::none) {
+        mode |= 0004;
+    }
+    if ((p & std::filesystem::perms::others_write) != std::filesystem::perms::none) {
+        mode |= 0002;
+    }
+    if ((p & std::filesystem::perms::others_exec) != std::filesystem::perms::none) {
+        mode |= 0001;
+    }
+    if ((p & std::filesystem::perms::set_uid) != std::filesystem::perms::none) {
+        mode |= 04000;
+    }
+    if ((p & std::filesystem::perms::set_gid) != std::filesystem::perms::none) {
+        mode |= 02000;
+    }
+    if ((p & std::filesystem::perms::sticky_bit) != std::filesystem::perms::none) {
+        mode |= 01000;
+    }
 
     std::ostringstream oss;
     oss << std::oct << std::setfill('0') << std::setw(4) << mode;

@@ -63,8 +63,12 @@ class compiled_regex::impl {
 
     impl &operator=(impl &&other) noexcept {
         if (this != &other) {
-            if (_match_data) pcre2_match_data_free(_match_data);
-            if (_code) pcre2_code_free(_code);
+            if (_match_data) {
+                pcre2_match_data_free(_match_data);
+            }
+            if (_code) {
+                pcre2_code_free(_code);
+            }
 
             _code = other._code;
             _match_data = other._match_data;
@@ -77,7 +81,9 @@ class compiled_regex::impl {
     }
 
     bool match(std::string_view subject) const {
-        if (!_code) return false;
+        if (!_code) {
+            return false;
+        }
 
         int rc = pcre2_match(_code, reinterpret_cast<PCRE2_SPTR>(subject.data()), subject.size(), 0,
                              PCRE2_ANCHORED | PCRE2_ENDANCHORED, _match_data, nullptr);
@@ -86,7 +92,9 @@ class compiled_regex::impl {
     }
 
     bool search(std::string_view subject) const {
-        if (!_code) return false;
+        if (!_code) {
+            return false;
+        }
 
         int rc = pcre2_match(_code, reinterpret_cast<PCRE2_SPTR>(subject.data()), subject.size(), 0, 0, _match_data,
                              nullptr);
@@ -95,7 +103,9 @@ class compiled_regex::impl {
     }
 
     std::optional<std::string> replace(std::string_view subject, std::string_view replacement) const {
-        if (!_code) return std::nullopt;
+        if (!_code) {
+            return std::nullopt;
+        }
 
         PCRE2_SIZE output_size = subject.size() * 2 + replacement.size() + 1;
         std::vector<PCRE2_UCHAR> output(output_size);
@@ -148,7 +158,9 @@ bool compiled_regex::search(std::string_view subject) const {
 }
 
 std::optional<std::string> compiled_regex::replace(std::string_view subject, std::string_view replacement) const {
-    if (!_impl) return std::nullopt;
+    if (!_impl) {
+        return std::nullopt;
+    }
     return _impl->replace(subject, replacement);
 }
 

@@ -29,7 +29,9 @@ result<std::vector<network_share_info>> list_mapped_drives_impl() noexcept;
 result<space_info> space(const path &p) noexcept {
     std::error_code ec;
     auto info = std::filesystem::space(p, ec);
-    if (ec) return std::unexpected(ec);
+    if (ec) {
+        return std::unexpected(ec);
+    }
     return info;
 }
 
@@ -155,26 +157,34 @@ result<storage_location_type> get_storage_location_type(const path &p) noexcept 
 
 result<bool> is_local_storage(const path &p) noexcept {
     auto type = get_storage_location_type(p);
-    if (!type) return std::unexpected(type.error());
+    if (!type) {
+        return std::unexpected(type.error());
+    }
     return *type == storage_location_type::local;
 }
 
 result<bool> is_removable_storage(const path &p) noexcept {
     auto type = get_storage_location_type(p);
-    if (!type) return std::unexpected(type.error());
+    if (!type) {
+        return std::unexpected(type.error());
+    }
     return *type == storage_location_type::removable || *type == storage_location_type::optical;
 }
 
 result<bool> is_network_storage(const path &p) noexcept {
     auto type = get_storage_location_type(p);
-    if (!type) return std::unexpected(type.error());
+    if (!type) {
+        return std::unexpected(type.error());
+    }
     return *type == storage_location_type::network_share || *type == storage_location_type::network_drive ||
            *type == storage_location_type::nfs;
 }
 
 result<bool> is_virtual_storage(const path &p) noexcept {
     auto type = get_storage_location_type(p);
-    if (!type) return std::unexpected(type.error());
+    if (!type) {
+        return std::unexpected(type.error());
+    }
     return *type == storage_location_type::virtual_fs || *type == storage_location_type::fuse ||
            *type == storage_location_type::ram || *type == storage_location_type::loop;
 }
@@ -220,7 +230,9 @@ result<bool> is_network_path(const path &p) noexcept {
 
 result<bool> is_remote_filesystem(const path &p) noexcept {
     auto fs_type = get_filesystem_type(p);
-    if (!fs_type) return std::unexpected(fs_type.error());
+    if (!fs_type) {
+        return std::unexpected(fs_type.error());
+    }
     return *fs_type == filesystem_type::nfs || *fs_type == filesystem_type::smb || *fs_type == filesystem_type::cifs ||
            *fs_type == filesystem_type::webdav;
 }
@@ -237,7 +249,9 @@ std::optional<unc_path_components> parse_unc_path(const path &p) noexcept {
     std::string path_str = p.string();
 
     // Check for UNC prefix
-    if (path_str.size() < 3) return std::nullopt;
+    if (path_str.size() < 3) {
+        return std::nullopt;
+    }
     if (!((path_str[0] == '\\' && path_str[1] == '\\') || (path_str[0] == '/' && path_str[1] == '/'))) {
         return std::nullopt;
     }
@@ -278,7 +292,9 @@ result<std::vector<network_share_info>> list_network_shares() noexcept {
 
 result<std::vector<network_share_info>> list_smb_shares() noexcept {
     auto all = list_network_shares();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<network_share_info> smb;
     for (const auto &s : *all) {
@@ -292,7 +308,9 @@ result<std::vector<network_share_info>> list_smb_shares() noexcept {
 
 result<std::vector<network_share_info>> list_nfs_mounts() noexcept {
     auto all = list_network_shares();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<network_share_info> nfs;
     for (const auto &s : *all) {
@@ -311,7 +329,9 @@ result<bool> is_share_available(const path &p) noexcept {
 
 result<bool> is_share_connected(const path &p) noexcept {
     auto info = get_network_share_info(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return info->is_connected;
 }
 
@@ -384,7 +404,9 @@ result<std::vector<removable_device_info>> list_removable_devices() noexcept {
 
 result<std::vector<removable_device_info>> list_usb_devices() noexcept {
     auto all = list_removable_devices();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<removable_device_info> usb;
     for (const auto &d : *all) {
@@ -399,7 +421,9 @@ result<std::vector<removable_device_info>> list_usb_devices() noexcept {
 
 result<std::vector<removable_device_info>> list_optical_drives() noexcept {
     auto all = list_removable_devices();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<removable_device_info> optical;
     for (const auto &d : *all) {
@@ -412,7 +436,9 @@ result<std::vector<removable_device_info>> list_optical_drives() noexcept {
 
 result<std::vector<removable_device_info>> list_card_readers() noexcept {
     auto all = list_removable_devices();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<removable_device_info> readers;
     for (const auto &d : *all) {
@@ -458,7 +484,9 @@ std::string_view device_status_name(device_status status) noexcept {
 
 result<device_status> get_device_status(const path &p) noexcept {
     auto ready = is_device_ready(p);
-    if (!ready) return std::unexpected(ready.error());
+    if (!ready) {
+        return std::unexpected(ready.error());
+    }
 
     if (!*ready) {
         auto media = is_media_present(p);
@@ -606,7 +634,9 @@ result<std::vector<mount_point_info>> list_all_mounts() noexcept {
 
 result<std::vector<mount_point_info>> list_local_mounts() noexcept {
     auto all_mounts = list_all_mounts();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     std::vector<mount_point_info> local;
     for (const auto &m : *all_mounts) {
@@ -619,7 +649,9 @@ result<std::vector<mount_point_info>> list_local_mounts() noexcept {
 
 result<std::vector<mount_point_info>> list_network_mounts() noexcept {
     auto all_mounts = list_all_mounts();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     std::vector<mount_point_info> network;
     for (const auto &m : *all_mounts) {
@@ -633,7 +665,9 @@ result<std::vector<mount_point_info>> list_network_mounts() noexcept {
 
 result<std::vector<mount_point_info>> list_removable_mounts() noexcept {
     auto all_mounts = list_all_mounts();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     std::vector<mount_point_info> removable;
     for (const auto &m : *all_mounts) {
@@ -651,10 +685,14 @@ result<mount_point_info> get_mount_point_info(const path &p) noexcept {
 result<path> find_mount_point(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     path best_match;
     size_t best_len = 0;
@@ -680,10 +718,14 @@ result<path> find_mount_point(const path &p) noexcept {
 result<std::vector<path>> get_all_mount_points_under(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     std::vector<path> result;
     std::string base_str = abs_path.string();
@@ -701,13 +743,17 @@ result<std::vector<path>> get_all_mount_points_under(const path &p) noexcept {
 
 result<std::string> get_mount_source(const path &p) noexcept {
     auto info = get_mount_point_info(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return info->device;
 }
 
 result<mount_tree_node> get_mount_tree() noexcept {
     auto all_mounts = list_all_mounts();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     // Find root mount
     mount_tree_node root;
@@ -736,7 +782,9 @@ result<mount_tree_node> get_mount_tree() noexcept {
 
 result<path> get_parent_mount(const path &p) noexcept {
     auto info = get_mount_point_info(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
 
     if (info->parent_mount.empty()) {
         return std::unexpected(make_error(std::errc::no_such_file_or_directory));
@@ -747,10 +795,14 @@ result<path> get_parent_mount(const path &p) noexcept {
 result<std::vector<path>> get_child_mounts(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     std::vector<path> children;
     for (const auto &m : *all_mounts) {
@@ -763,7 +815,9 @@ result<std::vector<path>> get_child_mounts(const path &p) noexcept {
 
 result<bool> is_submount(const path &p) noexcept {
     auto info = get_mount_point_info(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return !info->parent_mount.empty();
 }
 

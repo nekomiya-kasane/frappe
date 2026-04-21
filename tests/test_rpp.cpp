@@ -321,7 +321,9 @@ TEST(RppSlidingWindow, MovingAverage) {
     std::vector<double> averages;
     for (const auto &w : windows) {
         double sum = 0;
-        for (double x : w) sum += x;
+        for (double x : w) {
+            sum += x;
+        }
         averages.push_back(sum / w.size());
     }
     ASSERT_EQ(averages.size(), 3u);
@@ -697,7 +699,9 @@ TEST(RppTransform, FlatMap) {
 TEST(RppTransform, FilterMap) {
     auto v = std::vector{1, 2, 3, 4, 5};
     auto result = v | rpp::filter_map([](int x) -> std::optional<int> {
-                      if (x % 2 == 0) return x * 10;
+                      if (x % 2 == 0) {
+                          return x * 10;
+                      }
                       return std::nullopt;
                   }) |
                   rpp::to_vector;
@@ -916,7 +920,9 @@ TEST(RppBatch, SumBatches) {
     auto v = std::vector{1, 2, 3, 4, 5, 6};
     auto result = v | rpp::batch(3, [](const std::vector<int> &chunk) {
                       int s = 0;
-                      for (int x : chunk) s += x;
+                      for (int x : chunk) {
+                          s += x;
+                      }
                       return s;
                   });
     EXPECT_EQ(result, (std::vector{6, 15}));
@@ -964,7 +970,9 @@ TEST(RppPairwise, Differences) {
     auto v = std::vector{10, 13, 17, 22};
     auto pairs = v | rpp::pairwise;
     std::vector<int> diffs;
-    for (auto &[a, b] : pairs) diffs.push_back(b - a);
+    for (auto &[a, b] : pairs) {
+        diffs.push_back(b - a);
+    }
     EXPECT_EQ(diffs, (std::vector{3, 4, 5}));
 }
 

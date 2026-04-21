@@ -370,7 +370,9 @@ directory_traverser::iterator directory_traverser::iterator::operator++(int) {
 }
 
 bool directory_traverser::iterator::operator==(const iterator &other) const {
-    if (!_impl && !other._impl) return true;
+    if (!_impl && !other._impl) {
+        return true;
+    }
     if (!_impl || !other._impl) {
         // One is end iterator
         bool this_at_end = !_impl || _impl->at_end;
@@ -427,7 +429,9 @@ void traverse_with(const path &root, const std::function<bool(const file_entry &
 std::vector<file_entry> traverse_parallel(const path &root, const traversal_options &opts, unsigned int threads) {
     if (threads == 0) {
         threads = std::thread::hardware_concurrency();
-        if (threads == 0) threads = 4;
+        if (threads == 0) {
+            threads = 4;
+        }
     }
 
     std::vector<file_entry> result;
@@ -611,7 +615,9 @@ struct safe_recursive_iterator::impl {
     }
 
     void advance() {
-        if (at_end) return;
+        if (at_end) {
+            return;
+        }
 
         std::error_code ec;
         iter.increment(ec);
@@ -647,7 +653,9 @@ safe_recursive_iterator safe_recursive_iterator::operator++(int) {
 }
 
 bool safe_recursive_iterator::operator==(const safe_recursive_iterator &other) const {
-    if (!_impl && !other._impl) return true;
+    if (!_impl && !other._impl) {
+        return true;
+    }
     if (!_impl || !other._impl) {
         bool this_at_end = !_impl || _impl->at_end;
         bool other_at_end = !other._impl || other._impl->at_end;

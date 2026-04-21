@@ -16,7 +16,9 @@ namespace frappe::detail {
 
 namespace {
 std::string wstring_to_string(const std::wstring &wstr) {
-    if (wstr.empty()) return "";
+    if (wstr.empty()) {
+        return "";
+    }
     return std::string(wstr.begin(), wstr.end());
 }
 
@@ -34,12 +36,24 @@ partition_type get_partition_type_from_guid(const GUID &guid) {
     // Linux Swap
     static const GUID LINUX_SWAP = {0x0657FD6D, 0xA4AB, 0x43C4, {0x84, 0xE5, 0x09, 0x33, 0xC8, 0x4B, 0x4F, 0x4F}};
 
-    if (memcmp(&guid, &EFI_SYSTEM, sizeof(GUID)) == 0) return partition_type::efi_system;
-    if (memcmp(&guid, &MS_BASIC_DATA, sizeof(GUID)) == 0) return partition_type::microsoft_basic_data;
-    if (memcmp(&guid, &MS_RESERVED, sizeof(GUID)) == 0) return partition_type::microsoft_reserved;
-    if (memcmp(&guid, &MS_RECOVERY, sizeof(GUID)) == 0) return partition_type::microsoft_recovery;
-    if (memcmp(&guid, &LINUX_FS, sizeof(GUID)) == 0) return partition_type::linux_filesystem;
-    if (memcmp(&guid, &LINUX_SWAP, sizeof(GUID)) == 0) return partition_type::linux_swap;
+    if (memcmp(&guid, &EFI_SYSTEM, sizeof(GUID)) == 0) {
+        return partition_type::efi_system;
+    }
+    if (memcmp(&guid, &MS_BASIC_DATA, sizeof(GUID)) == 0) {
+        return partition_type::microsoft_basic_data;
+    }
+    if (memcmp(&guid, &MS_RESERVED, sizeof(GUID)) == 0) {
+        return partition_type::microsoft_reserved;
+    }
+    if (memcmp(&guid, &MS_RECOVERY, sizeof(GUID)) == 0) {
+        return partition_type::microsoft_recovery;
+    }
+    if (memcmp(&guid, &LINUX_FS, sizeof(GUID)) == 0) {
+        return partition_type::linux_filesystem;
+    }
+    if (memcmp(&guid, &LINUX_SWAP, sizeof(GUID)) == 0) {
+        return partition_type::linux_swap;
+    }
 
     return partition_type::unknown;
 }
@@ -87,7 +101,9 @@ result<std::vector<disk_info>> list_disks_impl() noexcept {
         HANDLE hDisk =
             CreateFileW(path.c_str(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
 
-        if (hDisk == INVALID_HANDLE_VALUE) continue;
+        if (hDisk == INVALID_HANDLE_VALUE) {
+            continue;
+        }
 
         disk_info info;
         info.device_path = "\\\\.\\PhysicalDrive" + std::to_string(i);
@@ -173,7 +189,9 @@ result<std::vector<disk_info>> list_disks_impl() noexcept {
 
 result<disk_info> get_disk_info_impl(std::string_view device_path) noexcept {
     auto disks = list_disks_impl();
-    if (!disks) return std::unexpected(disks.error());
+    if (!disks) {
+        return std::unexpected(disks.error());
+    }
 
     for (const auto &d : *disks) {
         if (d.device_path == device_path) {
@@ -269,7 +287,9 @@ result<partition_table_info> get_partition_table_impl(std::string_view device_pa
     for (DWORD i = 0; i < layout->PartitionCount; ++i) {
         const PARTITION_INFORMATION_EX &part = layout->PartitionEntry[i];
 
-        if (part.PartitionLength.QuadPart == 0) continue;
+        if (part.PartitionLength.QuadPart == 0) {
+            continue;
+        }
 
         partition_info pinfo;
         pinfo.device_path = std::string(device_path);
@@ -312,10 +332,14 @@ result<partition_table_info> get_partition_table_impl(std::string_view device_pa
 
 result<partition_info> get_partition_info_impl(const path &p) noexcept {
     auto disk = get_disk_for_path_impl(p);
-    if (!disk) return std::unexpected(disk.error());
+    if (!disk) {
+        return std::unexpected(disk.error());
+    }
 
     auto table = get_partition_table_impl(disk->device_path);
-    if (!table) return std::unexpected(table.error());
+    if (!table) {
+        return std::unexpected(table.error());
+    }
 
     std::wstring vol_path = p.root_name().wstring() + L"\\";
 
@@ -363,7 +387,9 @@ result<std::vector<partition_info>> list_partitions_impl() noexcept {
     std::vector<partition_info> all_partitions;
 
     auto disks = list_disks_impl();
-    if (!disks) return std::unexpected(disks.error());
+    if (!disks) {
+        return std::unexpected(disks.error());
+    }
 
     for (const auto &disk : *disks) {
         auto table = get_partition_table_impl(disk.device_path);
@@ -377,13 +403,17 @@ result<std::vector<partition_info>> list_partitions_impl() noexcept {
     // Try to find mount points for partitions
     DWORD drives = GetLogicalDrives();
     for (int i = 0; i < 26; ++i) {
-        if (!(drives & (1 << i))) continue;
+        if (!(drives & (1 << i))) {
+            continue;
+        }
 
         wchar_t drive_letter = static_cast<wchar_t>(L'A' + i);
         std::wstring drive_path = std::wstring(1, drive_letter) + L":\\";
 
         wchar_t volume_name[MAX_PATH] = {0};
-        if (!GetVolumeNameForVolumeMountPointW(drive_path.c_str(), volume_name, MAX_PATH)) continue;
+        if (!GetVolumeNameForVolumeMountPointW(drive_path.c_str(), volume_name, MAX_PATH)) {
+            continue;
+        }
 
         std::wstring vol_str(volume_name);
         if (!vol_str.empty() && vol_str.back() == L'\\') {
@@ -392,7 +422,9 @@ result<std::vector<partition_info>> list_partitions_impl() noexcept {
 
         HANDLE hVol =
             CreateFileW(vol_str.c_str(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
-        if (hVol == INVALID_HANDLE_VALUE) continue;
+        if (hVol == INVALID_HANDLE_VALUE) {
+            continue;
+        }
 
         VOLUME_DISK_EXTENTS extents;
         DWORD bytes_returned;
@@ -418,7 +450,9 @@ result<std::vector<partition_info>> list_partitions_impl() noexcept {
 
 result<std::string> get_containing_device_impl(const path &p) noexcept {
     auto disk = get_disk_for_path_impl(p);
-    if (!disk) return std::unexpected(disk.error());
+    if (!disk) {
+        return std::unexpected(disk.error());
+    }
     return disk->device_path;
 }
 
@@ -431,7 +465,9 @@ result<std::vector<mount_info>> list_mounts_impl() noexcept {
 
     DWORD drives = GetLogicalDrives();
     for (int i = 0; i < 26; ++i) {
-        if (!(drives & (1 << i))) continue;
+        if (!(drives & (1 << i))) {
+            continue;
+        }
 
         wchar_t drive_letter = static_cast<wchar_t>(L'A' + i);
         std::wstring drive_path = std::wstring(1, drive_letter) + L":\\";
@@ -575,7 +611,9 @@ void parse_vhd_footer(const path &p, virtual_disk_info &info) {
     std::wstring wpath = p.wstring();
     HANDLE hFile = CreateFileW(wpath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
                                FILE_ATTRIBUTE_NORMAL, nullptr);
-    if (hFile == INVALID_HANDLE_VALUE) return;
+    if (hFile == INVALID_HANDLE_VALUE) {
+        return;
+    }
 
     LARGE_INTEGER pos;
     pos.QuadPart = -512; // VHD footer is 512 bytes at end
@@ -593,7 +631,9 @@ void parse_vhd_footer(const path &p, virtual_disk_info &info) {
     CloseHandle(hFile);
 
     // VHD footer: magic "conectix", bytes 48-55 contain current size (big-endian)
-    if (memcmp(footer, "conectix", 8) != 0) return;
+    if (memcmp(footer, "conectix", 8) != 0) {
+        return;
+    }
 
     uint64_t size = 0;
     for (int i = 0; i < 8; ++i) {
@@ -625,22 +665,23 @@ result<virtual_disk_info> get_virtual_disk_info_impl(const path &p) noexcept {
         c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
 
-    if (ext == ".vhd")
+    if (ext == ".vhd") {
         info.type = virtual_disk_type::vhd;
-    else if (ext == ".vhdx")
+    } else if (ext == ".vhdx") {
         info.type = virtual_disk_type::vhdx;
-    else if (ext == ".vmdk")
+    } else if (ext == ".vmdk") {
         info.type = virtual_disk_type::vmdk;
-    else if (ext == ".vdi")
+    } else if (ext == ".vdi") {
         info.type = virtual_disk_type::vdi;
-    else if (ext == ".qcow" || ext == ".qcow2")
+    } else if (ext == ".qcow" || ext == ".qcow2") {
         info.type = virtual_disk_type::qcow2;
-    else if (ext == ".iso")
+    } else if (ext == ".iso") {
         info.type = virtual_disk_type::iso;
-    else if (ext == ".img")
+    } else if (ext == ".img") {
         info.type = virtual_disk_type::img;
-    else
+    } else {
         info.type = virtual_disk_type::unknown;
+    }
 
     // For VHD, try to read footer to get virtual size
     if (info.type == virtual_disk_type::vhd) {

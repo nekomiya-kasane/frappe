@@ -172,7 +172,9 @@ result<std::vector<partition_info>> list_partitions() noexcept {
 
 result<std::vector<partition_info>> list_mounted_partitions() noexcept {
     auto all = list_partitions();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<partition_info> mounted;
     for (const auto &p : *all) {
@@ -185,7 +187,9 @@ result<std::vector<partition_info>> list_mounted_partitions() noexcept {
 
 result<std::optional<partition_info>> get_partition_by_uuid(std::string_view uuid) noexcept {
     auto all = list_partitions();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     for (const auto &p : *all) {
         if (p.uuid == uuid) {
@@ -197,7 +201,9 @@ result<std::optional<partition_info>> get_partition_by_uuid(std::string_view uui
 
 result<std::optional<partition_info>> get_partition_by_label(std::string_view label) noexcept {
     auto all = list_partitions();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     for (const auto &p : *all) {
         if (p.label == label) {
@@ -209,7 +215,9 @@ result<std::optional<partition_info>> get_partition_by_label(std::string_view la
 
 result<std::vector<free_region>> get_free_regions(std::string_view device_path) noexcept {
     auto table = get_partition_table(device_path);
-    if (!table) return std::unexpected(table.error());
+    if (!table) {
+        return std::unexpected(table.error());
+    }
 
     std::vector<free_region> regions;
     std::uint64_t current = table->first_usable_sector;
@@ -246,7 +254,9 @@ result<std::vector<free_region>> get_free_regions(std::string_view device_path) 
 
 result<std::uint64_t> get_total_free_space(std::string_view device_path) noexcept {
     auto regions = get_free_regions(device_path);
-    if (!regions) return std::unexpected(regions.error());
+    if (!regions) {
+        return std::unexpected(regions.error());
+    }
 
     std::uint64_t total = 0;
     for (const auto &r : *regions) {
@@ -261,7 +271,9 @@ result<std::string> get_containing_device(const path &p) noexcept {
 
 result<bool> is_system_partition(const path &p) noexcept {
     auto info = get_partition_info(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
 
     // Check for system partition types
     return info->type == partition_type::efi_system || info->type == partition_type::microsoft_reserved ||
@@ -270,7 +282,9 @@ result<bool> is_system_partition(const path &p) noexcept {
 
 result<bool> is_boot_partition(const path &p) noexcept {
     auto info = get_partition_info(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
 
     return info->is_bootable || info->is_active || info->type == partition_type::efi_system ||
            info->type == partition_type::bios_boot;
@@ -290,7 +304,9 @@ result<std::vector<mount_info>> list_mounts() noexcept {
 
 result<mount_info> get_mount_info(const path &p) noexcept {
     auto mounts = list_mounts();
-    if (!mounts) return std::unexpected(mounts.error());
+    if (!mounts) {
+        return std::unexpected(mounts.error());
+    }
 
     std::string path_str = p.string();
     mount_info best_match;
@@ -312,7 +328,9 @@ result<mount_info> get_mount_info(const path &p) noexcept {
 
 result<bool> is_mounted(std::string_view device) noexcept {
     auto mounts = list_mounts();
-    if (!mounts) return std::unexpected(mounts.error());
+    if (!mounts) {
+        return std::unexpected(mounts.error());
+    }
 
     for (const auto &m : *mounts) {
         if (m.device == device) {
@@ -324,7 +342,9 @@ result<bool> is_mounted(std::string_view device) noexcept {
 
 result<std::string> get_mount_point(std::string_view device) noexcept {
     auto mounts = list_mounts();
-    if (!mounts) return std::unexpected(mounts.error());
+    if (!mounts) {
+        return std::unexpected(mounts.error());
+    }
 
     for (const auto &m : *mounts) {
         if (m.device == device) {
@@ -336,7 +356,9 @@ result<std::string> get_mount_point(std::string_view device) noexcept {
 
 result<std::string> get_device_by_mount_point(const path &mount_point) noexcept {
     auto mounts = list_mounts();
-    if (!mounts) return std::unexpected(mounts.error());
+    if (!mounts) {
+        return std::unexpected(mounts.error());
+    }
 
     std::string mp_str = mount_point.string();
     for (const auto &m : *mounts) {
@@ -349,7 +371,9 @@ result<std::string> get_device_by_mount_point(const path &mount_point) noexcept 
 
 result<bool> is_mount_point(const path &p) noexcept {
     auto mounts = list_mounts();
-    if (!mounts) return std::unexpected(mounts.error());
+    if (!mounts) {
+        return std::unexpected(mounts.error());
+    }
 
     std::string path_str = p.string();
     for (const auto &m : *mounts) {
@@ -362,7 +386,9 @@ result<bool> is_mount_point(const path &p) noexcept {
 
 result<std::vector<partition_info>> list_unmounted_partitions() noexcept {
     auto all = list_partitions();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<partition_info> unmounted;
     for (const auto &p : *all) {
@@ -395,7 +421,9 @@ result<disk_info> get_system_disk() noexcept {
 
 result<std::vector<disk_info>> list_physical_disks() noexcept {
     auto all = list_disks();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<disk_info> physical;
     for (const auto &d : *all) {
@@ -408,7 +436,9 @@ result<std::vector<disk_info>> list_physical_disks() noexcept {
 
 result<std::vector<disk_info>> list_removable_disks() noexcept {
     auto all = list_disks();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     std::vector<disk_info> removable;
     for (const auto &d : *all) {
@@ -421,7 +451,9 @@ result<std::vector<disk_info>> list_removable_disks() noexcept {
 
 result<std::optional<disk_info>> get_disk_by_serial(std::string_view serial) noexcept {
     auto all = list_disks();
-    if (!all) return std::unexpected(all.error());
+    if (!all) {
+        return std::unexpected(all.error());
+    }
 
     for (const auto &d : *all) {
         if (d.serial == serial) {
@@ -463,19 +495,25 @@ result<smart_info> get_smart_info(std::string_view device_path) noexcept {
 
 result<bool> is_smart_supported(std::string_view device_path) noexcept {
     auto info = get_smart_info(device_path);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return info->is_supported;
 }
 
 result<smart_status> get_disk_health(std::string_view device_path) noexcept {
     auto info = get_smart_info(device_path);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return info->health_status;
 }
 
 result<std::optional<std::int32_t>> get_disk_temperature(std::string_view device_path) noexcept {
     auto info = get_smart_info(device_path);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return info->temperature;
 }
 
@@ -489,7 +527,9 @@ result<nvme_info> get_nvme_info(std::string_view device_path) noexcept {
 
 result<bool> is_nvme_device(std::string_view device_path) noexcept {
     auto disk = get_disk_info(device_path);
-    if (!disk) return std::unexpected(disk.error());
+    if (!disk) {
+        return std::unexpected(disk.error());
+    }
     return disk->type == disk_type::nvme || disk->bus_type == disk_bus_type::nvme;
 }
 
@@ -568,7 +608,9 @@ result<std::vector<raid_info>> list_raid_arrays() noexcept {
 
 result<std::optional<storage_pool_info>> get_storage_pool(std::string_view name) noexcept {
     auto pools = list_storage_pools();
-    if (!pools) return std::unexpected(pools.error());
+    if (!pools) {
+        return std::unexpected(pools.error());
+    }
 
     for (const auto &p : *pools) {
         if (p.name == name) {
@@ -580,7 +622,9 @@ result<std::optional<storage_pool_info>> get_storage_pool(std::string_view name)
 
 result<std::optional<raid_info>> get_raid_info(std::string_view device_path) noexcept {
     auto arrays = list_raid_arrays();
-    if (!arrays) return std::unexpected(arrays.error());
+    if (!arrays) {
+        return std::unexpected(arrays.error());
+    }
 
     for (const auto &r : *arrays) {
         if (r.device_path == device_path) {
@@ -648,16 +692,36 @@ result<virtual_disk_type> get_virtual_disk_type(const path &p) noexcept {
         c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
 
-    if (ext == ".vhd") return virtual_disk_type::vhd;
-    if (ext == ".vhdx") return virtual_disk_type::vhdx;
-    if (ext == ".vmdk") return virtual_disk_type::vmdk;
-    if (ext == ".vdi") return virtual_disk_type::vdi;
-    if (ext == ".qcow") return virtual_disk_type::qcow;
-    if (ext == ".qcow2") return virtual_disk_type::qcow2;
-    if (ext == ".iso") return virtual_disk_type::iso;
-    if (ext == ".dmg") return virtual_disk_type::dmg;
-    if (ext == ".img") return virtual_disk_type::img;
-    if (ext == ".raw") return virtual_disk_type::raw;
+    if (ext == ".vhd") {
+        return virtual_disk_type::vhd;
+    }
+    if (ext == ".vhdx") {
+        return virtual_disk_type::vhdx;
+    }
+    if (ext == ".vmdk") {
+        return virtual_disk_type::vmdk;
+    }
+    if (ext == ".vdi") {
+        return virtual_disk_type::vdi;
+    }
+    if (ext == ".qcow") {
+        return virtual_disk_type::qcow;
+    }
+    if (ext == ".qcow2") {
+        return virtual_disk_type::qcow2;
+    }
+    if (ext == ".iso") {
+        return virtual_disk_type::iso;
+    }
+    if (ext == ".dmg") {
+        return virtual_disk_type::dmg;
+    }
+    if (ext == ".img") {
+        return virtual_disk_type::img;
+    }
+    if (ext == ".raw") {
+        return virtual_disk_type::raw;
+    }
 
     return virtual_disk_type::unknown;
 }
@@ -690,7 +754,9 @@ result<std::vector<path>> list_virtual_disk_files(const path &directory) noexcep
 
 result<std::vector<path>> get_virtual_disk_chain(const path &p) noexcept {
     auto info = get_virtual_disk_info(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
 
     std::vector<path> chain;
     chain.push_back(p);

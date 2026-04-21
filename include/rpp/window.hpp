@@ -220,7 +220,9 @@ constexpr auto ntile(std::size_t n) {
 
 // PERCENT_RANK
 inline constexpr auto percent_rank = [](const auto &ctx, const auto &) {
-    if (ctx.partition_size <= 1) return 0.0;
+    if (ctx.partition_size <= 1) {
+        return 0.0;
+    }
     return static_cast<double>(ctx.rank - 1) / (ctx.partition_size - 1);
 };
 

@@ -18,7 +18,9 @@ namespace frappe::detail {
 namespace {
 std::string read_sysfs_file(const std::string &path) {
     std::ifstream file(path);
-    if (!file) return "";
+    if (!file) {
+        return "";
+    }
     std::string content;
     std::getline(file, content);
     return content;
@@ -26,7 +28,9 @@ std::string read_sysfs_file(const std::string &path) {
 
 std::uint64_t read_sysfs_uint64(const std::string &path) {
     std::string content = read_sysfs_file(path);
-    if (content.empty()) return 0;
+    if (content.empty()) {
+        return 0;
+    }
     return std::stoull(content);
 }
 
@@ -45,7 +49,9 @@ std::string get_device_name(const std::string &device_path) {
 
 std::string find_mount_point(const std::string &device_path) {
     FILE *mtab = setmntent("/proc/mounts", "r");
-    if (!mtab) return "";
+    if (!mtab) {
+        return "";
+    }
 
     struct mntent *entry;
     while ((entry = getmntent(mtab)) != nullptr) {
@@ -73,10 +79,14 @@ result<std::vector<disk_info>> list_disks_impl() noexcept {
         std::string name = entry->d_name;
 
         // Skip . and ..
-        if (name == "." || name == "..") continue;
+        if (name == "." || name == "..") {
+            continue;
+        }
 
         // Skip loop devices, ram devices, etc.
-        if (name.find("loop") == 0 || name.find("ram") == 0 || name.find("dm-") == 0) continue;
+        if (name.find("loop") == 0 || name.find("ram") == 0 || name.find("dm-") == 0) {
+            continue;
+        }
 
         disk_info info;
         info.device_path = "/dev/" + name;
@@ -143,7 +153,9 @@ result<std::vector<disk_info>> list_disks_impl() noexcept {
 
 result<disk_info> get_disk_info_impl(std::string_view device_path) noexcept {
     auto disks = list_disks_impl();
-    if (!disks) return std::unexpected(disks.error());
+    if (!disks) {
+        return std::unexpected(disks.error());
+    }
 
     for (const auto &d : *disks) {
         if (d.device_path == device_path) {
@@ -211,7 +223,9 @@ result<partition_table_info> get_partition_table_impl(std::string_view device_pa
         std::string part_name = entry->d_name;
 
         // Check if this is a partition (starts with disk name)
-        if (part_name.find(name) != 0 || part_name == name) continue;
+        if (part_name.find(name) != 0 || part_name == name) {
+            continue;
+        }
 
         partition_info pinfo;
         pinfo.device_path = "/dev/" + part_name;
@@ -310,7 +324,9 @@ result<partition_info> get_partition_info_impl(const path &p) noexcept {
     }
 
     auto table = get_partition_table_impl("/dev/" + disk_name);
-    if (!table) return std::unexpected(table.error());
+    if (!table) {
+        return std::unexpected(table.error());
+    }
 
     for (const auto &part : table->partitions) {
         if (part.device_path == "/dev/" + part_name) {
@@ -325,7 +341,9 @@ result<std::vector<partition_info>> list_partitions_impl() noexcept {
     std::vector<partition_info> all_partitions;
 
     auto disks = list_disks_impl();
-    if (!disks) return std::unexpected(disks.error());
+    if (!disks) {
+        return std::unexpected(disks.error());
+    }
 
     for (const auto &disk : *disks) {
         auto table = get_partition_table_impl(disk.device_path);
@@ -341,7 +359,9 @@ result<std::vector<partition_info>> list_partitions_impl() noexcept {
 
 result<std::string> get_containing_device_impl(const path &p) noexcept {
     auto disk = get_disk_for_path_impl(p);
-    if (!disk) return std::unexpected(disk.error());
+    if (!disk) {
+        return std::unexpected(disk.error());
+    }
     return disk->device_path;
 }
 
@@ -539,16 +559,17 @@ result<std::vector<raid_info>> list_raid_arrays_impl() noexcept {
                     current.state = raid_state::inactive;
                 }
 
-                if (rest.find("raid0") != std::string::npos)
+                if (rest.find("raid0") != std::string::npos) {
                     current.level = raid_level::raid0;
-                else if (rest.find("raid1") != std::string::npos)
+                } else if (rest.find("raid1") != std::string::npos) {
                     current.level = raid_level::raid1;
-                else if (rest.find("raid5") != std::string::npos)
+                } else if (rest.find("raid5") != std::string::npos) {
                     current.level = raid_level::raid5;
-                else if (rest.find("raid6") != std::string::npos)
+                } else if (rest.find("raid6") != std::string::npos) {
                     current.level = raid_level::raid6;
-                else if (rest.find("raid10") != std::string::npos)
+                } else if (rest.find("raid10") != std::string::npos) {
                     current.level = raid_level::raid10;
+                }
 
                 // Parse device names
                 std::size_t pos = 0;
@@ -592,26 +613,27 @@ result<virtual_disk_info> get_virtual_disk_info_impl(const path &p) noexcept {
         c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
 
-    if (ext == ".vhd")
+    if (ext == ".vhd") {
         info.type = virtual_disk_type::vhd;
-    else if (ext == ".vhdx")
+    } else if (ext == ".vhdx") {
         info.type = virtual_disk_type::vhdx;
-    else if (ext == ".vmdk")
+    } else if (ext == ".vmdk") {
         info.type = virtual_disk_type::vmdk;
-    else if (ext == ".vdi")
+    } else if (ext == ".vdi") {
         info.type = virtual_disk_type::vdi;
-    else if (ext == ".qcow")
+    } else if (ext == ".qcow") {
         info.type = virtual_disk_type::qcow;
-    else if (ext == ".qcow2")
+    } else if (ext == ".qcow2") {
         info.type = virtual_disk_type::qcow2;
-    else if (ext == ".iso")
+    } else if (ext == ".iso") {
         info.type = virtual_disk_type::iso;
-    else if (ext == ".img")
+    } else if (ext == ".img") {
         info.type = virtual_disk_type::img;
-    else if (ext == ".raw")
+    } else if (ext == ".raw") {
         info.type = virtual_disk_type::raw;
-    else
+    } else {
         info.type = virtual_disk_type::unknown;
+    }
 
     // For QCOW2, try to read header
     if (info.type == virtual_disk_type::qcow2) {

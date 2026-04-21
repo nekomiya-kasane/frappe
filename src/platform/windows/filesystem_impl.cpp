@@ -20,13 +20,27 @@ filesystem_type parse_filesystem_name(const std::wstring &name) {
         lower_name.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
     }
 
-    if (lower_name == "ntfs") return filesystem_type::ntfs;
-    if (lower_name == "fat") return filesystem_type::fat;
-    if (lower_name == "fat32") return filesystem_type::fat32;
-    if (lower_name == "exfat") return filesystem_type::exfat;
-    if (lower_name == "refs") return filesystem_type::refs;
-    if (lower_name == "nfs") return filesystem_type::nfs;
-    if (lower_name == "cifs" || lower_name == "smbfs") return filesystem_type::smb;
+    if (lower_name == "ntfs") {
+        return filesystem_type::ntfs;
+    }
+    if (lower_name == "fat") {
+        return filesystem_type::fat;
+    }
+    if (lower_name == "fat32") {
+        return filesystem_type::fat32;
+    }
+    if (lower_name == "exfat") {
+        return filesystem_type::exfat;
+    }
+    if (lower_name == "refs") {
+        return filesystem_type::refs;
+    }
+    if (lower_name == "nfs") {
+        return filesystem_type::nfs;
+    }
+    if (lower_name == "cifs" || lower_name == "smbfs") {
+        return filesystem_type::smb;
+    }
 
     return filesystem_type::unknown;
 }
@@ -171,7 +185,9 @@ result<std::vector<volume_info>> list_volumes_impl() noexcept {
             wchar_t drive_path[4] = {static_cast<wchar_t>(L'A' + i), L':', L'\\', L'\0'};
 
             UINT drive_type = GetDriveTypeW(drive_path);
-            if (drive_type == DRIVE_NO_ROOT_DIR) continue;
+            if (drive_type == DRIVE_NO_ROOT_DIR) {
+                continue;
+            }
 
             auto info = get_volume_info_impl(drive_path);
             if (info) {
@@ -292,7 +308,9 @@ result<network_share_info> get_network_share_info_impl(const path &p) noexcept {
 
             std::size_t share_start = server_end + 1;
             std::size_t share_end = unc_path.find(L'\\', share_start);
-            if (share_end == std::wstring::npos) share_end = unc_path.size();
+            if (share_end == std::wstring::npos) {
+                share_end = unc_path.size();
+            }
 
             std::wstring share = unc_path.substr(share_start, share_end - share_start);
             info.share_name = std::string(share.begin(), share.end());
@@ -356,7 +374,9 @@ result<std::vector<removable_device_info>> list_removable_devices_impl() noexcep
 
     DWORD drives = GetLogicalDrives();
     for (int i = 0; i < 26; ++i) {
-        if (!(drives & (1 << i))) continue;
+        if (!(drives & (1 << i))) {
+            continue;
+        }
 
         wchar_t drive_path[4] = {static_cast<wchar_t>(L'A' + i), L':', L'\\', L'\0'};
         UINT drive_type = GetDriveTypeW(drive_path);
@@ -384,14 +404,15 @@ result<std::vector<removable_device_info>> list_removable_devices_impl() noexcep
 
                 std::wstring wfs(fs_name);
                 std::string fs_str(wfs.begin(), wfs.end());
-                if (fs_str == "NTFS")
+                if (fs_str == "NTFS") {
                     info.fs_type = filesystem_type::ntfs;
-                else if (fs_str == "FAT32")
+                } else if (fs_str == "FAT32") {
                     info.fs_type = filesystem_type::fat32;
-                else if (fs_str == "exFAT")
+                } else if (fs_str == "exFAT") {
                     info.fs_type = filesystem_type::exfat;
-                else if (fs_str == "FAT")
+                } else if (fs_str == "FAT") {
                     info.fs_type = filesystem_type::fat;
+                }
             }
 
             ULARGE_INTEGER total_bytes;
@@ -411,7 +432,9 @@ result<std::vector<removable_device_info>> list_removable_devices_impl() noexcep
 
 result<removable_device_info> get_removable_device_info_impl(const path &p) noexcept {
     auto devices = list_removable_devices_impl();
-    if (!devices) return std::unexpected(devices.error());
+    if (!devices) {
+        return std::unexpected(devices.error());
+    }
 
     std::string path_str = p.string();
     for (const auto &dev : *devices) {
@@ -426,7 +449,9 @@ result<removable_device_info> get_removable_device_info_impl(const path &p) noex
 result<bool> is_device_ready_impl(const path &p) noexcept {
     std::wstring root = p.root_path().wstring();
     UINT type = GetDriveTypeW(root.c_str());
-    if (type == DRIVE_NO_ROOT_DIR) return false;
+    if (type == DRIVE_NO_ROOT_DIR) {
+        return false;
+    }
 
     ULARGE_INTEGER free_bytes;
     return GetDiskFreeSpaceExW(root.c_str(), &free_bytes, nullptr, nullptr) != 0;
@@ -444,11 +469,21 @@ result<bool> is_cloud_path_impl(const path &p) noexcept {
     std::string path_str = p.string();
     std::transform(path_str.begin(), path_str.end(), path_str.begin(), ::tolower);
 
-    if (path_str.find("onedrive") != std::string::npos) return true;
-    if (path_str.find("dropbox") != std::string::npos) return true;
-    if (path_str.find("google drive") != std::string::npos) return true;
-    if (path_str.find("icloud") != std::string::npos) return true;
-    if (path_str.find("box sync") != std::string::npos) return true;
+    if (path_str.find("onedrive") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("dropbox") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("google drive") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("icloud") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("box sync") != std::string::npos) {
+        return true;
+    }
 
     return false;
 }
@@ -457,11 +492,21 @@ result<cloud_provider> get_cloud_provider_impl(const path &p) noexcept {
     std::string path_str = p.string();
     std::transform(path_str.begin(), path_str.end(), path_str.begin(), ::tolower);
 
-    if (path_str.find("onedrive") != std::string::npos) return cloud_provider::onedrive;
-    if (path_str.find("dropbox") != std::string::npos) return cloud_provider::dropbox;
-    if (path_str.find("google drive") != std::string::npos) return cloud_provider::google_drive;
-    if (path_str.find("icloud") != std::string::npos) return cloud_provider::icloud;
-    if (path_str.find("box sync") != std::string::npos) return cloud_provider::box;
+    if (path_str.find("onedrive") != std::string::npos) {
+        return cloud_provider::onedrive;
+    }
+    if (path_str.find("dropbox") != std::string::npos) {
+        return cloud_provider::dropbox;
+    }
+    if (path_str.find("google drive") != std::string::npos) {
+        return cloud_provider::google_drive;
+    }
+    if (path_str.find("icloud") != std::string::npos) {
+        return cloud_provider::icloud;
+    }
+    if (path_str.find("box sync") != std::string::npos) {
+        return cloud_provider::box;
+    }
 
     return cloud_provider::unknown;
 }
@@ -469,7 +514,9 @@ result<cloud_provider> get_cloud_provider_impl(const path &p) noexcept {
 result<cloud_storage_info> get_cloud_storage_info_impl(const path &p) noexcept {
     cloud_storage_info info;
     auto provider = get_cloud_provider_impl(p);
-    if (provider) info.provider = *provider;
+    if (provider) {
+        info.provider = *provider;
+    }
 
     if (info.provider == cloud_provider::unknown) {
         return std::unexpected(make_error(std::errc::no_such_file_or_directory));
@@ -577,10 +624,11 @@ result<virtual_fs_info> get_virtual_fs_info_impl(const path &p) noexcept {
     wchar_t fs_name[MAX_PATH] = {0};
     if (GetVolumeInformationW(root.c_str(), nullptr, 0, nullptr, nullptr, nullptr, fs_name, MAX_PATH)) {
         std::wstring fs(fs_name);
-        if (fs == L"WinFsp")
+        if (fs == L"WinFsp") {
             info.type = virtual_fs_type::winfsp;
-        else if (fs == L"Dokan")
+        } else if (fs == L"Dokan") {
             info.type = virtual_fs_type::dokan;
+        }
     }
 
     return info;
@@ -591,7 +639,9 @@ result<std::vector<virtual_fs_info>> list_virtual_mounts_impl() noexcept {
 
     DWORD drives = GetLogicalDrives();
     for (int i = 0; i < 26; ++i) {
-        if (!(drives & (1 << i))) continue;
+        if (!(drives & (1 << i))) {
+            continue;
+        }
 
         wchar_t drive_path[4] = {static_cast<wchar_t>(L'A' + i), L':', L'\\', L'\0'};
         wchar_t fs_name[MAX_PATH] = {0};
@@ -633,11 +683,21 @@ storage_location_type get_storage_type_for_drive(UINT drive_type) {
 }
 
 filesystem_type get_fs_type_from_name(const std::wstring &fs_name) {
-    if (fs_name == L"NTFS") return filesystem_type::ntfs;
-    if (fs_name == L"FAT32") return filesystem_type::fat32;
-    if (fs_name == L"FAT") return filesystem_type::fat;
-    if (fs_name == L"exFAT") return filesystem_type::exfat;
-    if (fs_name == L"ReFS") return filesystem_type::refs;
+    if (fs_name == L"NTFS") {
+        return filesystem_type::ntfs;
+    }
+    if (fs_name == L"FAT32") {
+        return filesystem_type::fat32;
+    }
+    if (fs_name == L"FAT") {
+        return filesystem_type::fat;
+    }
+    if (fs_name == L"exFAT") {
+        return filesystem_type::exfat;
+    }
+    if (fs_name == L"ReFS") {
+        return filesystem_type::refs;
+    }
     return filesystem_type::unknown;
 }
 } // namespace
@@ -647,7 +707,9 @@ result<std::vector<mount_point_info>> list_all_mounts_impl() noexcept {
 
     DWORD drives = GetLogicalDrives();
     for (int i = 0; i < 26; ++i) {
-        if (!(drives & (1 << i))) continue;
+        if (!(drives & (1 << i))) {
+            continue;
+        }
 
         wchar_t drive_path[4] = {static_cast<wchar_t>(L'A' + i), L':', L'\\', L'\0'};
         UINT drive_type = GetDriveTypeW(drive_path);
@@ -728,10 +790,14 @@ result<std::vector<mount_point_info>> list_all_mounts_impl() noexcept {
 result<mount_point_info> get_mount_point_info_impl(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts_impl();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     // Find best matching mount point
     mount_point_info best_match;
@@ -756,10 +822,14 @@ result<mount_point_info> get_mount_point_info_impl(const path &p) noexcept {
 result<bool> is_mount_point_impl(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts_impl();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     for (const auto &m : *all_mounts) {
         if (std::filesystem::equivalent(m.mount_path, abs_path, ec)) {

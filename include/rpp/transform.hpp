@@ -242,7 +242,9 @@ template <typename RNG = std::mt19937> struct sample_view : pipeable_base<sample
     template <input_range R> auto operator()(R &&r) const {
         auto items = std::forward<R>(r) | ::ranges::to<std::vector>();
 
-        if (n >= items.size()) return items;
+        if (n >= items.size()) {
+            return items;
+        }
 
         std::vector<range_value_t<R>> result;
         result.reserve(n);

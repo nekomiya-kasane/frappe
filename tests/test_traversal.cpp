@@ -44,7 +44,9 @@ TEST_F(TraversalTest, TraverseCollectFlat) {
     EXPECT_EQ(entries.size(), 3u);
 
     std::set<std::string> names;
-    for (auto &e : entries) names.insert(e.name);
+    for (auto &e : entries) {
+        names.insert(e.name);
+    }
     EXPECT_TRUE(names.count("a.txt"));
     EXPECT_TRUE(names.count("b.txt"));
     EXPECT_TRUE(names.count("c.txt"));
@@ -72,7 +74,9 @@ TEST_F(TraversalTest, TraverseWithMaxDepth) {
     // Should find top.txt and d1/ (and maybe d1/mid.txt at depth 1)
     // but NOT d1/d2/bottom.txt
     std::set<std::string> names;
-    for (auto &e : entries) names.insert(e.name);
+    for (auto &e : entries) {
+        names.insert(e.name);
+    }
     EXPECT_TRUE(names.count("top.txt"));
     EXPECT_FALSE(names.count("bottom.txt"));
 }
@@ -134,8 +138,7 @@ TEST_F(TraversalTest, DirectoryTraverserStats) {
     frappe::traversal_options opts;
     opts.include_hidden = true;
     frappe::directory_traverser traverser(tmp_dir_, opts);
-    for (auto it = traverser.begin(); it != traverser.end(); ++it) {
-    }
+    for (auto it = traverser.begin(); it != traverser.end(); ++it) {}
 
     auto &stats = traverser.stats();
     // 3 files + 1 directory = 4 entries total

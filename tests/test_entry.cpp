@@ -27,7 +27,9 @@ class EntryTest : public ::testing::Test {
 
     void touch(const std::filesystem::path &p, const std::string &content = "") {
         std::ofstream ofs(p);
-        if (!content.empty()) ofs << content;
+        if (!content.empty()) {
+            ofs << content;
+        }
     }
 };
 
@@ -110,7 +112,9 @@ TEST_F(EntryTest, ListEntriesFlat) {
     EXPECT_EQ(entries.size(), 3u);
 
     std::set<std::string> names;
-    for (auto &e : entries) names.insert(e.name);
+    for (auto &e : entries) {
+        names.insert(e.name);
+    }
     EXPECT_TRUE(names.count("a.txt"));
     EXPECT_TRUE(names.count("b.txt"));
     EXPECT_TRUE(names.count("c.txt"));
@@ -151,7 +155,9 @@ TEST_F(EntryTest, ListEntriesRecursive) {
     EXPECT_GE(entries.size(), 3u);
 
     std::set<std::string> names;
-    for (auto &e : entries) names.insert(e.name);
+    for (auto &e : entries) {
+        names.insert(e.name);
+    }
     EXPECT_TRUE(names.count("top.txt"));
     EXPECT_TRUE(names.count("nested.txt"));
     EXPECT_TRUE(names.count("sub"));

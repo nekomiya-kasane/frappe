@@ -28,34 +28,44 @@ result<access_rights> get_effective_rights_impl(const path &p) noexcept;
 result<perms> get_permissions(const path &p) noexcept {
     std::error_code ec;
     auto st = std::filesystem::status(p, ec);
-    if (ec) return std::unexpected(ec);
+    if (ec) {
+        return std::unexpected(ec);
+    }
     return st.permissions();
 }
 
 void_result set_permissions(const path &p, perms prms, perm_options opts) noexcept {
     std::error_code ec;
     std::filesystem::permissions(p, prms, opts, ec);
-    if (ec) return std::unexpected(ec);
+    if (ec) {
+        return std::unexpected(ec);
+    }
     return {};
 }
 
 void_result add_permissions(const path &p, perms prms) noexcept {
     std::error_code ec;
     std::filesystem::permissions(p, prms, perm_options::add, ec);
-    if (ec) return std::unexpected(ec);
+    if (ec) {
+        return std::unexpected(ec);
+    }
     return {};
 }
 
 void_result remove_permissions(const path &p, perms prms) noexcept {
     std::error_code ec;
     std::filesystem::permissions(p, prms, perm_options::remove, ec);
-    if (ec) return std::unexpected(ec);
+    if (ec) {
+        return std::unexpected(ec);
+    }
     return {};
 }
 
 result<bool> has_permission(const path &p, perms prm) noexcept {
     auto current = get_permissions(p);
-    if (!current) return std::unexpected(current.error());
+    if (!current) {
+        return std::unexpected(current.error());
+    }
     return (*current & prm) != perms::none;
 }
 
@@ -74,15 +84,33 @@ result<bool> is_executable(const path &p) noexcept {
 std::string permissions_to_string(perms prms) noexcept {
     std::string result(9, '-');
 
-    if ((prms & perms::owner_read) != perms::none) result[0] = 'r';
-    if ((prms & perms::owner_write) != perms::none) result[1] = 'w';
-    if ((prms & perms::owner_exec) != perms::none) result[2] = 'x';
-    if ((prms & perms::group_read) != perms::none) result[3] = 'r';
-    if ((prms & perms::group_write) != perms::none) result[4] = 'w';
-    if ((prms & perms::group_exec) != perms::none) result[5] = 'x';
-    if ((prms & perms::others_read) != perms::none) result[6] = 'r';
-    if ((prms & perms::others_write) != perms::none) result[7] = 'w';
-    if ((prms & perms::others_exec) != perms::none) result[8] = 'x';
+    if ((prms & perms::owner_read) != perms::none) {
+        result[0] = 'r';
+    }
+    if ((prms & perms::owner_write) != perms::none) {
+        result[1] = 'w';
+    }
+    if ((prms & perms::owner_exec) != perms::none) {
+        result[2] = 'x';
+    }
+    if ((prms & perms::group_read) != perms::none) {
+        result[3] = 'r';
+    }
+    if ((prms & perms::group_write) != perms::none) {
+        result[4] = 'w';
+    }
+    if ((prms & perms::group_exec) != perms::none) {
+        result[5] = 'x';
+    }
+    if ((prms & perms::others_read) != perms::none) {
+        result[6] = 'r';
+    }
+    if ((prms & perms::others_write) != perms::none) {
+        result[7] = 'w';
+    }
+    if ((prms & perms::others_exec) != perms::none) {
+        result[8] = 'x';
+    }
 
     if ((prms & perms::set_uid) != perms::none) {
         result[2] = (result[2] == 'x') ? 's' : 'S';
@@ -106,20 +134,46 @@ std::string permissions_to_octal(perms prms) noexcept {
 
 perms permissions_from_string(std::string_view str) noexcept {
     perms result = perms::none;
-    if (str.size() < 9) return result;
+    if (str.size() < 9) {
+        return result;
+    }
 
-    if (str[0] == 'r') result |= perms::owner_read;
-    if (str[1] == 'w') result |= perms::owner_write;
-    if (str[2] == 'x' || str[2] == 's') result |= perms::owner_exec;
-    if (str[2] == 's' || str[2] == 'S') result |= perms::set_uid;
-    if (str[3] == 'r') result |= perms::group_read;
-    if (str[4] == 'w') result |= perms::group_write;
-    if (str[5] == 'x' || str[5] == 's') result |= perms::group_exec;
-    if (str[5] == 's' || str[5] == 'S') result |= perms::set_gid;
-    if (str[6] == 'r') result |= perms::others_read;
-    if (str[7] == 'w') result |= perms::others_write;
-    if (str[8] == 'x' || str[8] == 't') result |= perms::others_exec;
-    if (str[8] == 't' || str[8] == 'T') result |= perms::sticky_bit;
+    if (str[0] == 'r') {
+        result |= perms::owner_read;
+    }
+    if (str[1] == 'w') {
+        result |= perms::owner_write;
+    }
+    if (str[2] == 'x' || str[2] == 's') {
+        result |= perms::owner_exec;
+    }
+    if (str[2] == 's' || str[2] == 'S') {
+        result |= perms::set_uid;
+    }
+    if (str[3] == 'r') {
+        result |= perms::group_read;
+    }
+    if (str[4] == 'w') {
+        result |= perms::group_write;
+    }
+    if (str[5] == 'x' || str[5] == 's') {
+        result |= perms::group_exec;
+    }
+    if (str[5] == 's' || str[5] == 'S') {
+        result |= perms::set_gid;
+    }
+    if (str[6] == 'r') {
+        result |= perms::others_read;
+    }
+    if (str[7] == 'w') {
+        result |= perms::others_write;
+    }
+    if (str[8] == 'x' || str[8] == 't') {
+        result |= perms::others_exec;
+    }
+    if (str[8] == 't' || str[8] == 'T') {
+        result |= perms::sticky_bit;
+    }
 
     return result;
 }
@@ -198,25 +252,33 @@ void_result set_owner(const path &p, std::uint32_t uid, std::uint32_t gid) noexc
 
 void_result set_owner_user(const path &p, std::uint32_t uid) noexcept {
     auto info = get_owner(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return set_owner(p, uid, info->gid);
 }
 
 void_result set_owner_user(const path &p, std::string_view user_name) noexcept {
     auto uid = user_id_from_name(user_name);
-    if (!uid) return std::unexpected(make_error(std::errc::invalid_argument));
+    if (!uid) {
+        return std::unexpected(make_error(std::errc::invalid_argument));
+    }
     return set_owner_user(p, *uid);
 }
 
 void_result set_owner_group(const path &p, std::uint32_t gid) noexcept {
     auto info = get_owner(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return set_owner(p, info->uid, gid);
 }
 
 void_result set_owner_group(const path &p, std::string_view group_name) noexcept {
     auto gid = group_id_from_name(group_name);
-    if (!gid) return std::unexpected(make_error(std::errc::invalid_argument));
+    if (!gid) {
+        return std::unexpected(make_error(std::errc::invalid_argument));
+    }
     return set_owner_group(p, *gid);
 }
 
@@ -290,7 +352,9 @@ std::vector<std::string> get_user_groups(std::string_view user_name) noexcept {
 bool is_user_in_group(std::string_view user_name, std::string_view group_name) noexcept {
     auto groups = get_user_groups(user_name);
     for (const auto &g : groups) {
-        if (g == group_name) return true;
+        if (g == group_name) {
+            return true;
+        }
     }
     return false;
 }
@@ -371,7 +435,9 @@ result<bool> has_acl(const path &p) noexcept {
 
 result<bool> has_default_acl(const path &p) noexcept {
     auto acl = get_default_acl(p);
-    if (!acl) return std::unexpected(acl.error());
+    if (!acl) {
+        return std::unexpected(acl.error());
+    }
     return !acl->entries.empty();
 }
 
@@ -389,14 +455,18 @@ void_result set_default_acl(const path &p, const acl_info &acl) noexcept {
 
 void_result add_acl_entry(const path &p, const acl_entry &entry) noexcept {
     auto acl = get_acl(p);
-    if (!acl) return std::unexpected(acl.error());
+    if (!acl) {
+        return std::unexpected(acl.error());
+    }
     acl->entries.push_back(entry);
     return set_acl(p, *acl);
 }
 
 void_result remove_acl_entry(const path &p, const acl_entry &entry) noexcept {
     auto acl = get_acl(p);
-    if (!acl) return std::unexpected(acl.error());
+    if (!acl) {
+        return std::unexpected(acl.error());
+    }
 
     auto &entries = acl->entries;
     entries.erase(
@@ -423,49 +493,65 @@ result<win_attributes> get_win_attributes(const path &p) noexcept {
 
 result<bool> is_readonly(const path &p) noexcept {
     auto attrs = get_win_attributes(p);
-    if (!attrs) return std::unexpected(attrs.error());
+    if (!attrs) {
+        return std::unexpected(attrs.error());
+    }
     return has_attribute(*attrs, win_attributes::readonly);
 }
 
 result<bool> is_hidden(const path &p) noexcept {
     auto attrs = get_win_attributes(p);
-    if (!attrs) return std::unexpected(attrs.error());
+    if (!attrs) {
+        return std::unexpected(attrs.error());
+    }
     return has_attribute(*attrs, win_attributes::hidden);
 }
 
 result<bool> is_system_file(const path &p) noexcept {
     auto attrs = get_win_attributes(p);
-    if (!attrs) return std::unexpected(attrs.error());
+    if (!attrs) {
+        return std::unexpected(attrs.error());
+    }
     return has_attribute(*attrs, win_attributes::system);
 }
 
 result<bool> is_archive(const path &p) noexcept {
     auto attrs = get_win_attributes(p);
-    if (!attrs) return std::unexpected(attrs.error());
+    if (!attrs) {
+        return std::unexpected(attrs.error());
+    }
     return has_attribute(*attrs, win_attributes::archive);
 }
 
 result<bool> is_compressed(const path &p) noexcept {
     auto attrs = get_win_attributes(p);
-    if (!attrs) return std::unexpected(attrs.error());
+    if (!attrs) {
+        return std::unexpected(attrs.error());
+    }
     return has_attribute(*attrs, win_attributes::compressed);
 }
 
 result<bool> is_encrypted(const path &p) noexcept {
     auto attrs = get_win_attributes(p);
-    if (!attrs) return std::unexpected(attrs.error());
+    if (!attrs) {
+        return std::unexpected(attrs.error());
+    }
     return has_attribute(*attrs, win_attributes::encrypted);
 }
 
 result<bool> is_sparse(const path &p) noexcept {
     auto attrs = get_win_attributes(p);
-    if (!attrs) return std::unexpected(attrs.error());
+    if (!attrs) {
+        return std::unexpected(attrs.error());
+    }
     return has_attribute(*attrs, win_attributes::sparse);
 }
 
 result<bool> is_reparse_point(const path &p) noexcept {
     auto attrs = get_win_attributes(p);
-    if (!attrs) return std::unexpected(attrs.error());
+    if (!attrs) {
+        return std::unexpected(attrs.error());
+    }
     return has_attribute(*attrs, win_attributes::reparse_point);
 }
 
@@ -475,35 +561,47 @@ void_result set_win_attributes(const path &p, win_attributes attrs) noexcept {
 
 void_result add_win_attribute(const path &p, win_attributes attr) noexcept {
     auto current = get_win_attributes(p);
-    if (!current) return std::unexpected(current.error());
+    if (!current) {
+        return std::unexpected(current.error());
+    }
     return set_win_attributes(p, *current | attr);
 }
 
 void_result remove_win_attribute(const path &p, win_attributes attr) noexcept {
     auto current = get_win_attributes(p);
-    if (!current) return std::unexpected(current.error());
+    if (!current) {
+        return std::unexpected(current.error());
+    }
     auto new_attrs =
         static_cast<win_attributes>(static_cast<std::uint32_t>(*current) & ~static_cast<std::uint32_t>(attr));
     return set_win_attributes(p, new_attrs);
 }
 
 void_result set_readonly(const path &p, bool value) noexcept {
-    if (value) return add_win_attribute(p, win_attributes::readonly);
+    if (value) {
+        return add_win_attribute(p, win_attributes::readonly);
+    }
     return remove_win_attribute(p, win_attributes::readonly);
 }
 
 void_result set_hidden(const path &p, bool value) noexcept {
-    if (value) return add_win_attribute(p, win_attributes::hidden);
+    if (value) {
+        return add_win_attribute(p, win_attributes::hidden);
+    }
     return remove_win_attribute(p, win_attributes::hidden);
 }
 
 void_result set_system_file(const path &p, bool value) noexcept {
-    if (value) return add_win_attribute(p, win_attributes::system);
+    if (value) {
+        return add_win_attribute(p, win_attributes::system);
+    }
     return remove_win_attribute(p, win_attributes::system);
 }
 
 void_result set_archive(const path &p, bool value) noexcept {
-    if (value) return add_win_attribute(p, win_attributes::archive);
+    if (value) {
+        return add_win_attribute(p, win_attributes::archive);
+    }
     return remove_win_attribute(p, win_attributes::archive);
 }
 

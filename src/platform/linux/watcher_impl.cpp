@@ -189,14 +189,20 @@ void file_watcher::impl::watch_loop() {
 
         int ret = select(max_fd + 1, &read_fds, nullptr, nullptr, &timeout);
 
-        if (!_running) break;
-
-        if (ret < 0) {
-            if (errno == EINTR) continue;
+        if (!_running) {
             break;
         }
 
-        if (ret == 0) continue; // Timeout
+        if (ret < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            break;
+        }
+
+        if (ret == 0) {
+            continue; // Timeout
+        }
 
         if (FD_ISSET(_stop_pipe[0], &read_fds)) {
             break; // Stop signal
@@ -204,7 +210,9 @@ void file_watcher::impl::watch_loop() {
 
         if (FD_ISSET(_inotify_fd, &read_fds)) {
             ssize_t len = read(_inotify_fd, buffer, BUF_SIZE);
-            if (len <= 0) continue;
+            if (len <= 0) {
+                continue;
+            }
 
             process_inotify_events(buffer, len);
         }
@@ -230,7 +238,9 @@ void file_watcher::impl::process_single_event(const struct inotify_event *event)
         }
     }
 
-    if (dir_path.empty()) return;
+    if (dir_path.empty()) {
+        return;
+    }
 
     path full_path = dir_path;
     if (event->len > 0) {
@@ -252,12 +262,24 @@ void file_watcher::impl::process_single_event(const struct inotify_event *event)
 }
 
 watch_event_type file_watcher::impl::mask_to_event_type(uint32_t mask) {
-    if (mask & IN_CREATE) return watch_event_type::added;
-    if (mask & IN_DELETE) return watch_event_type::removed;
-    if (mask & IN_MODIFY) return watch_event_type::modified;
-    if (mask & (IN_MOVED_FROM | IN_MOVED_TO)) return watch_event_type::renamed;
-    if (mask & IN_ATTRIB) return watch_event_type::attributes;
-    if (mask & (IN_DELETE_SELF | IN_MOVE_SELF)) return watch_event_type::removed;
+    if (mask & IN_CREATE) {
+        return watch_event_type::added;
+    }
+    if (mask & IN_DELETE) {
+        return watch_event_type::removed;
+    }
+    if (mask & IN_MODIFY) {
+        return watch_event_type::modified;
+    }
+    if (mask & (IN_MOVED_FROM | IN_MOVED_TO)) {
+        return watch_event_type::renamed;
+    }
+    if (mask & IN_ATTRIB) {
+        return watch_event_type::attributes;
+    }
+    if (mask & (IN_DELETE_SELF | IN_MOVE_SELF)) {
+        return watch_event_type::removed;
+    }
     return watch_event_type::modified;
 }
 

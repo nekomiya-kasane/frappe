@@ -529,7 +529,9 @@ mapped_file_chunks::mapped_file_chunks(const path &p, std::size_t chunk_size) : 
 }
 
 std::size_t mapped_file_chunks::chunk_count() const noexcept {
-    if (_file_size == 0) return 0;
+    if (_file_size == 0) {
+        return 0;
+    }
     return (_file_size + _chunk_size - 1) / _chunk_size;
 }
 

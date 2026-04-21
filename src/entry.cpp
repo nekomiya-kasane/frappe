@@ -13,7 +13,9 @@ namespace frappe {
 namespace {
 bool is_hidden_name(const path &p) noexcept {
     auto name = p.filename().string();
-    if (name.empty()) return false;
+    if (name.empty()) {
+        return false;
+    }
 #ifdef _WIN32
     // On Windows, check file attributes
     DWORD attrs = GetFileAttributesW(p.c_str());
@@ -51,7 +53,9 @@ char file_type_indicator(file_type ft) noexcept {
 }
 
 char file_type_indicator(const file_entry &e) noexcept {
-    if (e.is_symlink) return '@';
+    if (e.is_symlink) {
+        return '@';
+    }
     if (e.type == file_type::regular) {
         // Check if executable
         if ((e.permissions & perms::owner_exec) != perms::none || (e.permissions & perms::group_exec) != perms::none ||
@@ -75,7 +79,9 @@ result<file_entry> get_file_entry(const path &p) noexcept {
 
     // Get status
     auto st = std::filesystem::symlink_status(p, ec);
-    if (ec) return std::unexpected(ec);
+    if (ec) {
+        return std::unexpected(ec);
+    }
 
     entry.type = st.type();
     entry.permissions = st.permissions();
@@ -85,18 +91,24 @@ result<file_entry> get_file_entry(const path &p) noexcept {
     // Size (only for regular files)
     if (st.type() == file_type::regular) {
         entry.size = std::filesystem::file_size(p, ec);
-        if (ec) entry.size = 0;
+        if (ec) {
+            entry.size = 0;
+        }
     }
 
     // Hard link count
     entry.hard_link_count = std::filesystem::hard_link_count(p, ec);
-    if (ec) entry.hard_link_count = 1;
+    if (ec) {
+        entry.hard_link_count = 1;
+    }
 
     // Timestamps
     entry.mtime = std::filesystem::last_write_time(p, ec);
 
     auto atime_result = last_access_time(p);
-    if (atime_result) entry.atime = *atime_result;
+    if (atime_result) {
+        entry.atime = *atime_result;
+    }
 
     auto ctime_result = creation_time(p);
     if (ctime_result) {
@@ -177,18 +189,24 @@ file_entry get_file_entry(const std::filesystem::directory_entry &dir_entry) noe
     // Size
     if (dir_entry.is_regular_file(ec)) {
         entry.size = dir_entry.file_size(ec);
-        if (ec) entry.size = 0;
+        if (ec) {
+            entry.size = 0;
+        }
     }
 
     // Hard link count
     entry.hard_link_count = dir_entry.hard_link_count(ec);
-    if (ec) entry.hard_link_count = 1;
+    if (ec) {
+        entry.hard_link_count = 1;
+    }
 
     // Timestamps
     entry.mtime = dir_entry.last_write_time(ec);
 
     auto atime_result = last_access_time(p);
-    if (atime_result) entry.atime = *atime_result;
+    if (atime_result) {
+        entry.atime = *atime_result;
+    }
 
     auto ctime_result = creation_time(p);
     if (ctime_result) {
@@ -232,7 +250,9 @@ std::vector<file_entry> list_entries(const path &dir, const list_options &opts) 
     std::error_code ec;
 
     for (const auto &entry : std::filesystem::directory_iterator(dir, ec)) {
-        if (ec) continue;
+        if (ec) {
+            continue;
+        }
 
         auto file_entry = get_file_entry(entry);
 
@@ -264,7 +284,9 @@ std::vector<file_entry> list_entries_recursive(const path &dir, const list_optio
     }
 
     for (const auto &entry : std::filesystem::recursive_directory_iterator(dir, dir_opts, ec)) {
-        if (ec) continue;
+        if (ec) {
+            continue;
+        }
 
         auto file_entry = get_file_entry(entry);
 
@@ -288,7 +310,9 @@ std::generator<file_entry> enumerate_entries(const path &dir, const list_options
     std::error_code ec;
 
     for (const auto &entry : std::filesystem::directory_iterator(dir, ec)) {
-        if (ec) continue;
+        if (ec) {
+            continue;
+        }
 
         auto file_entry = get_file_entry(entry);
 
@@ -316,7 +340,9 @@ std::generator<file_entry> enumerate_entries_recursive(const path &dir, const li
     }
 
     for (const auto &entry : std::filesystem::recursive_directory_iterator(dir, dir_opts, ec)) {
-        if (ec) continue;
+        if (ec) {
+            continue;
+        }
 
         auto file_entry = get_file_entry(entry);
 

@@ -233,13 +233,17 @@ inline bool natural_less(const std::string &a, const std::string &b) {
         if (a_digit && b_digit) {
             auto [num_a, len_a] = extract_number(a, i);
             auto [num_b, len_b] = extract_number(b, j);
-            if (num_a != num_b) return num_a < num_b;
+            if (num_a != num_b) {
+                return num_a < num_b;
+            }
             i += len_a;
             j += len_b;
         } else {
             unsigned char ca = static_cast<unsigned char>(std::tolower(a[i]));
             unsigned char cb = static_cast<unsigned char>(std::tolower(b[j]));
-            if (ca != cb) return ca < cb;
+            if (ca != cb) {
+                return ca < cb;
+            }
             ++i;
             ++j;
         }

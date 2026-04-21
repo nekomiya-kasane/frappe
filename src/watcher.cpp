@@ -34,23 +34,35 @@ void file_watcher::impl::dispatch_event(const watch_event &event) {
         return;
     }
 
-    if (_on_event) _on_event(event);
+    if (_on_event) {
+        _on_event(event);
+    }
 
     switch (event.type) {
     case watch_event_type::added:
-        if (_on_add) _on_add(event);
+        if (_on_add) {
+            _on_add(event);
+        }
         break;
     case watch_event_type::modified:
-        if (_on_change) _on_change(event);
+        if (_on_change) {
+            _on_change(event);
+        }
         break;
     case watch_event_type::removed:
-        if (_on_remove) _on_remove(event);
+        if (_on_remove) {
+            _on_remove(event);
+        }
         break;
     case watch_event_type::renamed:
-        if (_on_rename) _on_rename(event);
+        if (_on_rename) {
+            _on_rename(event);
+        }
         break;
     case watch_event_type::error:
-        if (_on_error) _on_error(event.error);
+        if (_on_error) {
+            _on_error(event.error);
+        }
         break;
     default:
         break;
@@ -61,10 +73,18 @@ bool file_watcher::impl::should_ignore(const path &p) const {
     std::string filename = p.filename().string();
     for (const auto &pattern : _options.ignored_patterns) {
         // Simple glob matching (just * for now)
-        if (pattern == "*") return true;
-        if (pattern.front() == '*' && filename.ends_with(pattern.substr(1))) return true;
-        if (pattern.back() == '*' && filename.starts_with(pattern.substr(0, pattern.size() - 1))) return true;
-        if (filename == pattern) return true;
+        if (pattern == "*") {
+            return true;
+        }
+        if (pattern.front() == '*' && filename.ends_with(pattern.substr(1))) {
+            return true;
+        }
+        if (pattern.back() == '*' && filename.starts_with(pattern.substr(0, pattern.size() - 1))) {
+            return true;
+        }
+        if (filename == pattern) {
+            return true;
+        }
     }
     return false;
 }
@@ -87,7 +107,9 @@ void_result file_watcher::add(const path &p) {
 void_result file_watcher::add(std::span<const path> paths) {
     for (const auto &p : paths) {
         auto result = _impl->add(p);
-        if (!result) return result;
+        if (!result) {
+            return result;
+        }
     }
     return {};
 }

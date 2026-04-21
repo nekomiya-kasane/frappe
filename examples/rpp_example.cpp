@@ -167,11 +167,17 @@ int main() {
     auto except_result = set1 | rpp::except(set2);
 
     std::cout << "   Union: ";
-    for (int x : union_result) std::cout << x << " ";
+    for (int x : union_result) {
+        std::cout << x << " ";
+    }
     std::cout << "\n   Intersect: ";
-    for (int x : intersect_result) std::cout << x << " ";
+    for (int x : intersect_result) {
+        std::cout << x << " ";
+    }
     std::cout << "\n   Except: ";
-    for (int x : except_result) std::cout << x << " ";
+    for (int x : except_result) {
+        std::cout << x << " ";
+    }
     std::cout << "\n";
 
     // =========================================================================

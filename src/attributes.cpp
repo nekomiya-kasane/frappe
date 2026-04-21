@@ -28,7 +28,9 @@ result<std::vector<std::uint8_t>> extended_attributes::get(std::string_view name
 
 result<std::string> extended_attributes::get_string(std::string_view name) const noexcept {
     auto data = get(name);
-    if (!data) return std::unexpected(data.error());
+    if (!data) {
+        return std::unexpected(data.error());
+    }
     return std::string(data->begin(), data->end());
 }
 
@@ -228,7 +230,9 @@ std::string extension_from_mime_type(std::string_view mime) noexcept {
 result<std::string> detect_mime_type(const path &p) noexcept {
     std::error_code ec;
     if (!std::filesystem::exists(p, ec) || ec) {
-        if (ec) return std::unexpected(ec);
+        if (ec) {
+            return std::unexpected(ec);
+        }
         return std::unexpected(make_error(std::errc::no_such_file_or_directory));
     }
 
@@ -243,7 +247,9 @@ result<std::string> detect_mime_type(const path &p) noexcept {
 result<std::string> mime_type_from_content(const path &p) noexcept {
     std::error_code ec;
     if (!std::filesystem::exists(p, ec) || ec) {
-        if (ec) return std::unexpected(ec);
+        if (ec) {
+            return std::unexpected(ec);
+        }
         return std::unexpected(make_error(std::errc::no_such_file_or_directory));
     }
 
@@ -426,13 +432,17 @@ result<file_type_info> identify_file_type(const path &p) noexcept {
 
 result<bool> is_text_file(const path &p) noexcept {
     auto info = identify_file_type(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return info->category == file_category::text || info->category == file_category::script;
 }
 
 result<bool> is_binary_file(const path &p) noexcept {
     auto info = identify_file_type(p);
-    if (!info) return std::unexpected(info.error());
+    if (!info) {
+        return std::unexpected(info.error());
+    }
     return info->category != file_category::text && info->category != file_category::script;
 }
 

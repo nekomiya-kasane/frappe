@@ -219,7 +219,9 @@ class glob_iterator::impl {
     void advance() { ++_index; }
 
     bool equal(const impl *other) const {
-        if (!other) return at_end();
+        if (!other) {
+            return at_end();
+        }
         return _index == other->_index && _results.size() == other->_results.size();
     }
 
@@ -260,8 +262,12 @@ glob_iterator glob_iterator::operator++(int) {
 }
 
 bool glob_iterator::operator==(const glob_iterator &other) const {
-    if (!_impl && !other._impl) return true;
-    if (!_impl || !other._impl) return false;
+    if (!_impl && !other._impl) {
+        return true;
+    }
+    if (!_impl || !other._impl) {
+        return false;
+    }
     return _impl->equal(other._impl.get());
 }
 

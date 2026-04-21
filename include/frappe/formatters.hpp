@@ -219,13 +219,13 @@ template <> struct std::formatter<frappe::file_entry> {
         if (it != ctx.end() && *it == ':') {
             ++it;
             while (it != ctx.end() && *it != '}') {
-                if (*it == 'h')
+                if (*it == 'h') {
                     human_size = true;
-                else if (*it == 'o')
+                } else if (*it == 'o') {
                     octal_perms = true;
-                else if (*it == 'r')
+                } else if (*it == 'r') {
                     relative_path = true;
-                else if (*it == '%') {
+                } else if (*it == '%') {
                     // Time format starts with %
                     time_format.clear();
                     while (it != ctx.end() && *it != '}') {

@@ -65,7 +65,9 @@ struct take_adapter {
         result.reserve(count);
         std::size_t i = 0;
         for (auto &&item : r) {
-            if (i++ >= count) break;
+            if (i++ >= count) {
+                break;
+            }
             result.push_back(std::forward<decltype(item)>(item));
         }
         return result;
@@ -112,7 +114,9 @@ template <typename Pred> struct take_while_adapter {
     template <std::ranges::input_range R> auto operator()(R &&r) const {
         std::vector<std::ranges::range_value_t<R>> result;
         for (auto &&item : r) {
-            if (!predicate(item)) break;
+            if (!predicate(item)) {
+                break;
+            }
             result.push_back(std::forward<decltype(item)>(item));
         }
         return result;
@@ -135,7 +139,9 @@ template <typename Pred> struct drop_while_adapter {
         std::vector<std::ranges::range_value_t<R>> result;
         bool dropping = true;
         for (auto &&item : r) {
-            if (dropping && predicate(item)) continue;
+            if (dropping && predicate(item)) {
+                continue;
+            }
             dropping = false;
             result.push_back(std::forward<decltype(item)>(item));
         }
@@ -179,7 +185,9 @@ template <typename Pred> struct count_if_adapter {
     template <std::ranges::input_range R> auto operator()(R &&r) const -> std::size_t {
         std::size_t n = 0;
         for (auto &&item : r) {
-            if (predicate(item)) ++n;
+            if (predicate(item)) {
+                ++n;
+            }
         }
         return n;
     }
@@ -406,7 +414,9 @@ template <typename Pred> struct any_adapter {
 
     template <std::ranges::input_range R> auto operator()(R &&r) const -> bool {
         for (const auto &item : r) {
-            if (predicate(item)) return true;
+            if (predicate(item)) {
+                return true;
+            }
         }
         return false;
     }
@@ -425,7 +435,9 @@ template <typename Pred> struct all_adapter {
 
     template <std::ranges::input_range R> auto operator()(R &&r) const -> bool {
         for (const auto &item : r) {
-            if (!predicate(item)) return false;
+            if (!predicate(item)) {
+                return false;
+            }
         }
         return true;
     }
@@ -444,7 +456,9 @@ template <typename Pred> struct none_adapter {
 
     template <std::ranges::input_range R> auto operator()(R &&r) const -> bool {
         for (const auto &item : r) {
-            if (predicate(item)) return false;
+            if (predicate(item)) {
+                return false;
+            }
         }
         return true;
     }

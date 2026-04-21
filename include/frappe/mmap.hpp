@@ -178,7 +178,9 @@ class FRAPPE_API mapped_view {
     }
 
     [[nodiscard]] mapped_view subview(std::size_t offset, std::size_t length) const noexcept {
-        if (offset >= _size) return mapped_view{};
+        if (offset >= _size) {
+            return mapped_view{};
+        }
         length = std::min(length, _size - offset);
         return mapped_view{_data + offset, length};
     }

@@ -24,7 +24,9 @@ namespace rpp {
 inline constexpr struct first_fn : pipeable_base<first_fn> {
     template <input_range R> constexpr auto operator()(R &&r) const -> std::optional<range_value_t<R>> {
         auto it = ::ranges::begin(r);
-        if (it != ::ranges::end(r)) return *it;
+        if (it != ::ranges::end(r)) {
+            return *it;
+        }
         return std::nullopt;
     }
 } first{};
@@ -71,7 +73,9 @@ inline constexpr struct nth_fn {
         return make_closure([n](auto &&r) -> std::optional<range_value_t<decltype(r)>> {
             std::size_t i = 0;
             for (auto &&item : r) {
-                if (i++ == n) return std::forward<decltype(item)>(item);
+                if (i++ == n) {
+                    return std::forward<decltype(item)>(item);
+                }
             }
             return std::nullopt;
         });
@@ -279,7 +283,9 @@ inline constexpr struct reduce_fn {
         return make_closure([op = std::move(op)](auto &&r) -> std::optional<range_value_t<decltype(r)>> {
             auto it = ::ranges::begin(r);
             auto end = ::ranges::end(r);
-            if (it == end) return std::nullopt;
+            if (it == end) {
+                return std::nullopt;
+            }
 
             auto result = *it++;
             while (it != end) {

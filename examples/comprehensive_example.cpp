@@ -14,18 +14,26 @@ void demo_path_operations() {
     print_section("Path Operations");
 
     auto home = frappe::home_path();
-    if (home) std::cout << "Home path: " << home->string() << "\n";
+    if (home) {
+        std::cout << "Home path: " << home->string() << "\n";
+    }
 
     auto exe = frappe::executable_path();
-    if (exe) std::cout << "Executable: " << exe->string() << "\n";
+    if (exe) {
+        std::cout << "Executable: " << exe->string() << "\n";
+    }
 
     std::cout << "Temp path: " << std::filesystem::temp_directory_path().string() << "\n";
 
     auto docs = frappe::documents_path();
-    if (docs) std::cout << "Documents: " << docs->string() << "\n";
+    if (docs) {
+        std::cout << "Documents: " << docs->string() << "\n";
+    }
 
     auto downloads = frappe::downloads_path();
-    if (downloads) std::cout << "Downloads: " << downloads->string() << "\n";
+    if (downloads) {
+        std::cout << "Downloads: " << downloads->string() << "\n";
+    }
 }
 
 void demo_permissions() {

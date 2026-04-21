@@ -73,7 +73,9 @@ struct join_str_view : pipeable_base<join_str_view> {
         std::ostringstream oss;
         bool first = true;
         for (auto &&item : r) {
-            if (!first) oss << separator;
+            if (!first) {
+                oss << separator;
+            }
             oss << std::forward<decltype(item)>(item);
             first = false;
         }
@@ -205,7 +207,9 @@ template <typename... Headers> struct format_table_view : pipeable_base<format_t
             out << '\n';
         };
 
-        if (rows.empty()) return "";
+        if (rows.empty()) {
+            return "";
+        }
 
         std::size_t start = 0;
         if constexpr (sizeof...(Headers) > 0) {
@@ -488,7 +492,9 @@ template <typename Pred> struct take_while_view : pipeable_base<take_while_view<
         using T = range_value_t<R>;
         std::vector<T> result;
         for (auto &&item : r) {
-            if (!pred(item)) break;
+            if (!pred(item)) {
+                break;
+            }
             result.push_back(std::forward<decltype(item)>(item));
         }
         return owning_view<std::vector<T>>{std::move(result)};
@@ -515,7 +521,9 @@ template <typename Pred> struct drop_while_view : pipeable_base<drop_while_view<
         std::vector<T> result;
         bool dropping = true;
         for (auto &&item : r) {
-            if (dropping && pred(item)) continue;
+            if (dropping && pred(item)) {
+                continue;
+            }
             dropping = false;
             result.push_back(std::forward<decltype(item)>(item));
         }

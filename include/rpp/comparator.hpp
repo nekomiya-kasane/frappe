@@ -101,8 +101,12 @@ struct natural_comparator {
                 auto a_start = ai;
                 auto b_start = bi;
 
-                while (ai != ae && std::isdigit(static_cast<unsigned char>(*ai))) ++ai;
-                while (bi != be && std::isdigit(static_cast<unsigned char>(*bi))) ++bi;
+                while (ai != ae && std::isdigit(static_cast<unsigned char>(*ai))) {
+                    ++ai;
+                }
+                while (bi != be && std::isdigit(static_cast<unsigned char>(*bi))) {
+                    ++bi;
+                }
 
                 auto a_len = ai - a_start;
                 auto b_len = bi - b_start;
@@ -117,15 +121,21 @@ struct natural_comparator {
                     --b_len;
                 }
 
-                if (a_len != b_len) return a_len < b_len;
+                if (a_len != b_len) {
+                    return a_len < b_len;
+                }
 
                 auto cmp = std::string_view(&*a_start, a_len).compare(std::string_view(&*b_start, b_len));
-                if (cmp != 0) return cmp < 0;
+                if (cmp != 0) {
+                    return cmp < 0;
+                }
             } else {
                 // Compare character by character (case-insensitive)
                 auto ca = std::tolower(static_cast<unsigned char>(*ai));
                 auto cb = std::tolower(static_cast<unsigned char>(*bi));
-                if (ca != cb) return ca < cb;
+                if (ca != cb) {
+                    return ca < cb;
+                }
                 ++ai;
                 ++bi;
             }

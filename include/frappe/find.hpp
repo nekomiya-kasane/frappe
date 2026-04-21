@@ -266,7 +266,9 @@ struct take_fn {
         result.reserve(count);
         std::size_t i = 0;
         for (auto &&item : r) {
-            if (i++ >= count) break;
+            if (i++ >= count) {
+                break;
+            }
             result.push_back(std::forward<decltype(item)>(item));
         }
         return result;

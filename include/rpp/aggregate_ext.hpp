@@ -56,7 +56,9 @@ template <typename Proj = std::identity> struct max_by_view : pipeable_base<max_
 
     template <input_range R> constexpr auto operator()(R &&r) const -> std::optional<range_value_t<R>> {
         auto it = ::ranges::max_element(r, std::less<>{}, proj);
-        if (it != ::ranges::end(r)) return *it;
+        if (it != ::ranges::end(r)) {
+            return *it;
+        }
         return std::nullopt;
     }
 };
@@ -76,7 +78,9 @@ template <typename Proj = std::identity> struct min_by_view : pipeable_base<min_
 
     template <input_range R> constexpr auto operator()(R &&r) const -> std::optional<range_value_t<R>> {
         auto it = ::ranges::min_element(r, std::less<>{}, proj);
-        if (it != ::ranges::end(r)) return *it;
+        if (it != ::ranges::end(r)) {
+            return *it;
+        }
         return std::nullopt;
     }
 };
@@ -144,7 +148,9 @@ template <typename Proj = std::identity> struct variance_view : pipeable_base<va
             ++count;
         }
 
-        if (count == 0 || (sample && count == 1)) return 0.0;
+        if (count == 0 || (sample && count == 1)) {
+            return 0.0;
+        }
 
         double mean = sum / count;
         double divisor = sample ? (count - 1) : count;
@@ -247,7 +253,9 @@ template <typename Proj = std::identity> struct percentile_view : pipeable_base<
             values.push_back(std::invoke(proj, item));
         }
 
-        if (values.empty()) return T{};
+        if (values.empty()) {
+            return T{};
+        }
 
         std::sort(values.begin(), values.end());
 
@@ -256,7 +264,9 @@ template <typename Proj = std::identity> struct percentile_view : pipeable_base<
         std::size_t upper = lower + 1;
         double frac = idx - lower;
 
-        if (upper >= values.size()) return values.back();
+        if (upper >= values.size()) {
+            return values.back();
+        }
 
         if constexpr (std::is_arithmetic_v<T>) {
             return static_cast<T>(values[lower] * (1 - frac) + values[upper] * frac);

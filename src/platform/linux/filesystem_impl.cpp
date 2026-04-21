@@ -14,25 +14,63 @@ namespace frappe::detail {
 
 namespace {
 filesystem_type parse_filesystem_name(const std::string &name) {
-    if (name == "ext2") return filesystem_type::ext2;
-    if (name == "ext3") return filesystem_type::ext3;
-    if (name == "ext4") return filesystem_type::ext4;
-    if (name == "xfs") return filesystem_type::xfs;
-    if (name == "btrfs") return filesystem_type::btrfs;
-    if (name == "zfs") return filesystem_type::zfs;
-    if (name == "ntfs" || name == "ntfs-3g" || name == "fuseblk") return filesystem_type::ntfs;
-    if (name == "vfat" || name == "fat") return filesystem_type::fat;
-    if (name == "fat32") return filesystem_type::fat32;
-    if (name == "exfat") return filesystem_type::exfat;
-    if (name == "nfs" || name == "nfs4") return filesystem_type::nfs;
-    if (name == "cifs" || name == "smbfs") return filesystem_type::smb;
-    if (name == "tmpfs") return filesystem_type::tmpfs;
-    if (name == "ramfs") return filesystem_type::ramfs;
-    if (name == "devtmpfs" || name == "devfs") return filesystem_type::devfs;
-    if (name == "proc") return filesystem_type::procfs;
-    if (name == "sysfs") return filesystem_type::sysfs;
-    if (name.find("fuse") != std::string::npos) return filesystem_type::fuse;
-    if (name == "overlay") return filesystem_type::overlay;
+    if (name == "ext2") {
+        return filesystem_type::ext2;
+    }
+    if (name == "ext3") {
+        return filesystem_type::ext3;
+    }
+    if (name == "ext4") {
+        return filesystem_type::ext4;
+    }
+    if (name == "xfs") {
+        return filesystem_type::xfs;
+    }
+    if (name == "btrfs") {
+        return filesystem_type::btrfs;
+    }
+    if (name == "zfs") {
+        return filesystem_type::zfs;
+    }
+    if (name == "ntfs" || name == "ntfs-3g" || name == "fuseblk") {
+        return filesystem_type::ntfs;
+    }
+    if (name == "vfat" || name == "fat") {
+        return filesystem_type::fat;
+    }
+    if (name == "fat32") {
+        return filesystem_type::fat32;
+    }
+    if (name == "exfat") {
+        return filesystem_type::exfat;
+    }
+    if (name == "nfs" || name == "nfs4") {
+        return filesystem_type::nfs;
+    }
+    if (name == "cifs" || name == "smbfs") {
+        return filesystem_type::smb;
+    }
+    if (name == "tmpfs") {
+        return filesystem_type::tmpfs;
+    }
+    if (name == "ramfs") {
+        return filesystem_type::ramfs;
+    }
+    if (name == "devtmpfs" || name == "devfs") {
+        return filesystem_type::devfs;
+    }
+    if (name == "proc") {
+        return filesystem_type::procfs;
+    }
+    if (name == "sysfs") {
+        return filesystem_type::sysfs;
+    }
+    if (name.find("fuse") != std::string::npos) {
+        return filesystem_type::fuse;
+    }
+    if (name == "overlay") {
+        return filesystem_type::overlay;
+    }
 
     return filesystem_type::unknown;
 }
@@ -445,7 +483,9 @@ result<std::vector<removable_device_info>> list_removable_devices_impl() noexcep
 
 result<removable_device_info> get_removable_device_info_impl(const path &p) noexcept {
     auto devices = list_removable_devices_impl();
-    if (!devices) return std::unexpected(devices.error());
+    if (!devices) {
+        return std::unexpected(devices.error());
+    }
 
     std::string path_str = p.string();
     for (const auto &dev : *devices) {
@@ -473,11 +513,21 @@ result<bool> is_media_present_impl(const path &p) noexcept {
 result<bool> is_cloud_path_impl(const path &p) noexcept {
     std::string path_str = p.string();
 
-    if (path_str.find("Dropbox") != std::string::npos) return true;
-    if (path_str.find("Google Drive") != std::string::npos) return true;
-    if (path_str.find("OneDrive") != std::string::npos) return true;
-    if (path_str.find("Nextcloud") != std::string::npos) return true;
-    if (path_str.find("ownCloud") != std::string::npos) return true;
+    if (path_str.find("Dropbox") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("Google Drive") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("OneDrive") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("Nextcloud") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("ownCloud") != std::string::npos) {
+        return true;
+    }
 
     // Check for rclone mounts
     auto entries = get_mount_entries();
@@ -493,11 +543,21 @@ result<bool> is_cloud_path_impl(const path &p) noexcept {
 result<cloud_provider> get_cloud_provider_impl(const path &p) noexcept {
     std::string path_str = p.string();
 
-    if (path_str.find("Dropbox") != std::string::npos) return cloud_provider::dropbox;
-    if (path_str.find("Google Drive") != std::string::npos) return cloud_provider::google_drive;
-    if (path_str.find("OneDrive") != std::string::npos) return cloud_provider::onedrive;
-    if (path_str.find("Nextcloud") != std::string::npos) return cloud_provider::nextcloud;
-    if (path_str.find("ownCloud") != std::string::npos) return cloud_provider::owncloud;
+    if (path_str.find("Dropbox") != std::string::npos) {
+        return cloud_provider::dropbox;
+    }
+    if (path_str.find("Google Drive") != std::string::npos) {
+        return cloud_provider::google_drive;
+    }
+    if (path_str.find("OneDrive") != std::string::npos) {
+        return cloud_provider::onedrive;
+    }
+    if (path_str.find("Nextcloud") != std::string::npos) {
+        return cloud_provider::nextcloud;
+    }
+    if (path_str.find("ownCloud") != std::string::npos) {
+        return cloud_provider::owncloud;
+    }
 
     return cloud_provider::unknown;
 }
@@ -505,7 +565,9 @@ result<cloud_provider> get_cloud_provider_impl(const path &p) noexcept {
 result<cloud_storage_info> get_cloud_storage_info_impl(const path &p) noexcept {
     cloud_storage_info info;
     auto provider = get_cloud_provider_impl(p);
-    if (provider) info.provider = *provider;
+    if (provider) {
+        info.provider = *provider;
+    }
 
     if (info.provider == cloud_provider::unknown) {
         return std::unexpected(make_error(std::errc::no_such_file_or_directory));
@@ -553,27 +615,41 @@ result<std::vector<cloud_storage_info>> list_cloud_mounts_impl() noexcept {
 
 result<bool> is_virtual_filesystem_impl(const path &p) noexcept {
     auto mount = find_mount_entry(p.string());
-    if (!mount) return false;
+    if (!mount) {
+        return false;
+    }
 
     const std::string &fs = mount->fs_type;
-    if (fs.find("fuse") == 0) return true;
-    if (fs == "tmpfs" || fs == "ramfs") return true;
-    if (fs == "overlay" || fs == "aufs" || fs == "unionfs") return true;
-    if (fs == "proc" || fs == "sysfs" || fs == "devtmpfs") return true;
+    if (fs.find("fuse") == 0) {
+        return true;
+    }
+    if (fs == "tmpfs" || fs == "ramfs") {
+        return true;
+    }
+    if (fs == "overlay" || fs == "aufs" || fs == "unionfs") {
+        return true;
+    }
+    if (fs == "proc" || fs == "sysfs" || fs == "devtmpfs") {
+        return true;
+    }
 
     return false;
 }
 
 result<bool> is_fuse_mount_impl(const path &p) noexcept {
     auto mount = find_mount_entry(p.string());
-    if (!mount) return false;
+    if (!mount) {
+        return false;
+    }
 
     return mount->fs_type.find("fuse") == 0;
 }
 
 result<bool> is_encrypted_mount_impl(const path &p) noexcept {
     auto mount = find_mount_entry(p.string());
-    if (!mount) return false;
+    if (!mount) {
+        return false;
+    }
 
     const std::string &fs = mount->fs_type;
     if (fs == "fuse.encfs" || fs == "fuse.gocryptfs" || fs == "fuse.veracrypt") {
@@ -600,22 +676,23 @@ result<virtual_fs_info> get_virtual_fs_info_impl(const path &p) noexcept {
     info.source = mount->device;
 
     const std::string &fs = mount->fs_type;
-    if (fs.find("fuse") == 0)
+    if (fs.find("fuse") == 0) {
         info.type = virtual_fs_type::fuse;
-    else if (fs == "tmpfs")
+    } else if (fs == "tmpfs") {
         info.type = virtual_fs_type::tmpfs;
-    else if (fs == "ramfs")
+    } else if (fs == "ramfs") {
         info.type = virtual_fs_type::ramfs;
-    else if (fs == "overlay")
+    } else if (fs == "overlay") {
         info.type = virtual_fs_type::overlay;
-    else if (fs == "proc")
+    } else if (fs == "proc") {
         info.type = virtual_fs_type::procfs;
-    else if (fs == "sysfs")
+    } else if (fs == "sysfs") {
         info.type = virtual_fs_type::sysfs;
+    }
 
-    if (fs == "fuse.sshfs")
+    if (fs == "fuse.sshfs") {
         info.type = virtual_fs_type::sshfs;
-    else if (fs == "fuse.encfs") {
+    } else if (fs == "fuse.encfs") {
         info.type = virtual_fs_type::encfs;
         info.is_encrypted = true;
     } else if (fs == "fuse.gocryptfs") {
@@ -669,7 +746,9 @@ storage_location_type get_storage_type_from_fs(const std::string &fs_type, const
         while (!dev_name.empty() && std::isdigit(dev_name.back())) {
             dev_name.pop_back();
         }
-        if (dev_name.ends_with("p")) dev_name.pop_back(); // nvme0n1p1 -> nvme0n1
+        if (dev_name.ends_with("p")) {
+            dev_name.pop_back(); // nvme0n1p1 -> nvme0n1
+        }
 
         std::string removable_path = "/sys/block/" + dev_name + "/removable";
         std::ifstream f(removable_path);
@@ -683,19 +762,45 @@ storage_location_type get_storage_type_from_fs(const std::string &fs_type, const
 }
 
 filesystem_type get_fs_type_from_name_linux(const std::string &fs_name) {
-    if (fs_name == "ext4") return filesystem_type::ext4;
-    if (fs_name == "ext3") return filesystem_type::ext3;
-    if (fs_name == "ext2") return filesystem_type::ext2;
-    if (fs_name == "xfs") return filesystem_type::xfs;
-    if (fs_name == "btrfs") return filesystem_type::btrfs;
-    if (fs_name == "zfs") return filesystem_type::zfs;
-    if (fs_name == "ntfs" || fs_name == "ntfs3" || fs_name == "fuseblk") return filesystem_type::ntfs;
-    if (fs_name == "vfat" || fs_name == "fat32") return filesystem_type::fat32;
-    if (fs_name == "exfat") return filesystem_type::exfat;
-    if (fs_name == "nfs" || fs_name == "nfs4") return filesystem_type::nfs;
-    if (fs_name == "cifs" || fs_name == "smbfs") return filesystem_type::cifs;
-    if (fs_name == "tmpfs") return filesystem_type::tmpfs;
-    if (fs_name == "overlay") return filesystem_type::overlay;
+    if (fs_name == "ext4") {
+        return filesystem_type::ext4;
+    }
+    if (fs_name == "ext3") {
+        return filesystem_type::ext3;
+    }
+    if (fs_name == "ext2") {
+        return filesystem_type::ext2;
+    }
+    if (fs_name == "xfs") {
+        return filesystem_type::xfs;
+    }
+    if (fs_name == "btrfs") {
+        return filesystem_type::btrfs;
+    }
+    if (fs_name == "zfs") {
+        return filesystem_type::zfs;
+    }
+    if (fs_name == "ntfs" || fs_name == "ntfs3" || fs_name == "fuseblk") {
+        return filesystem_type::ntfs;
+    }
+    if (fs_name == "vfat" || fs_name == "fat32") {
+        return filesystem_type::fat32;
+    }
+    if (fs_name == "exfat") {
+        return filesystem_type::exfat;
+    }
+    if (fs_name == "nfs" || fs_name == "nfs4") {
+        return filesystem_type::nfs;
+    }
+    if (fs_name == "cifs" || fs_name == "smbfs") {
+        return filesystem_type::cifs;
+    }
+    if (fs_name == "tmpfs") {
+        return filesystem_type::tmpfs;
+    }
+    if (fs_name == "overlay") {
+        return filesystem_type::overlay;
+    }
     return filesystem_type::unknown;
 }
 
@@ -704,18 +809,19 @@ void parse_mount_options(const std::string &opts_str, mount_point_info &info) {
     std::string opt;
     while (std::getline(iss, opt, ',')) {
         info.options.push_back(opt);
-        if (opt == "ro")
+        if (opt == "ro") {
             info.is_readonly = true;
-        else if (opt == "noexec")
+        } else if (opt == "noexec") {
             info.is_noexec = true;
-        else if (opt == "nosuid")
+        } else if (opt == "nosuid") {
             info.is_nosuid = true;
-        else if (opt == "nodev")
+        } else if (opt == "nodev") {
             info.is_nodev = true;
-        else if (opt == "bind")
+        } else if (opt == "bind") {
             info.is_bind = true;
-        else if (opt == "loop")
+        } else if (opt == "loop") {
             info.is_loop = true;
+        }
     }
 }
 } // namespace
@@ -734,7 +840,9 @@ result<std::vector<mount_point_info>> list_all_mounts_impl() noexcept {
 
         // Determine parent mount
         for (const auto &other : entries) {
-            if (other.mount_point == entry.mount_point) continue;
+            if (other.mount_point == entry.mount_point) {
+                continue;
+            }
             std::string other_mp = other.mount_point;
             std::string this_mp = entry.mount_point;
             if (this_mp.starts_with(other_mp) && (other_mp == "/" || this_mp[other_mp.length()] == '/')) {
@@ -753,10 +861,14 @@ result<std::vector<mount_point_info>> list_all_mounts_impl() noexcept {
 result<mount_point_info> get_mount_point_info_impl(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts_impl();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     mount_point_info best_match;
     size_t best_len = 0;
@@ -784,10 +896,14 @@ result<mount_point_info> get_mount_point_info_impl(const path &p) noexcept {
 result<bool> is_mount_point_impl(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts_impl();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     std::string path_str = abs_path.string();
     for (const auto &m : *all_mounts) {

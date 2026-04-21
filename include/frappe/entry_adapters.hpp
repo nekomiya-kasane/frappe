@@ -116,7 +116,9 @@ inline const auto broken_links_only = rpp::filter([](const file_entry &e) { retu
 
 [[nodiscard]] inline auto extension_in(std::vector<std::string> exts) {
     for (auto &e : exts) {
-        if (!e.starts_with('.')) e = "." + e;
+        if (!e.starts_with('.')) {
+            e = "." + e;
+        }
     }
     return rpp::filters::in(proj::extension, std::move(exts));
 }

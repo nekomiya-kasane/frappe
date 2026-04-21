@@ -147,7 +147,9 @@ void file_watcher::impl::watch_loop() {
             event.is_directory = std::filesystem::is_directory(full_path, ec);
             dispatch_event(event);
 
-            if (info->NextEntryOffset == 0) break;
+            if (info->NextEntryOffset == 0) {
+                break;
+            }
             info = reinterpret_cast<FILE_NOTIFY_INFORMATION *>(reinterpret_cast<BYTE *>(info) + info->NextEntryOffset);
         }
     };
@@ -177,13 +179,17 @@ void file_watcher::impl::watch_loop() {
         DWORD result = WaitForMultipleObjects(static_cast<DWORD>(wait_handles.size()), wait_handles.data(), FALSE,
                                               static_cast<DWORD>(_options.poll_interval.count()));
 
-        if (!_running) break;
+        if (!_running) {
+            break;
+        }
 
         if (result == WAIT_TIMEOUT) {
             continue;
         }
 
-        if (result < WAIT_OBJECT_0 || result >= WAIT_OBJECT_0 + events.size()) continue;
+        if (result < WAIT_OBJECT_0 || result >= WAIT_OBJECT_0 + events.size()) {
+            continue;
+        }
 
         size_t idx = result - WAIT_OBJECT_0;
 

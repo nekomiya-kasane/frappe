@@ -12,16 +12,36 @@ namespace frappe::detail {
 
 namespace {
 filesystem_type parse_filesystem_name(const std::string &name) {
-    if (name == "apfs") return filesystem_type::apfs;
-    if (name == "hfs" || name == "hfs+") return filesystem_type::hfs_plus;
-    if (name == "msdos" || name == "fat32") return filesystem_type::fat32;
-    if (name == "exfat") return filesystem_type::exfat;
-    if (name == "ntfs") return filesystem_type::ntfs;
-    if (name == "nfs") return filesystem_type::nfs;
-    if (name == "smbfs" || name == "cifs") return filesystem_type::smb;
-    if (name == "webdav") return filesystem_type::webdav;
-    if (name == "devfs") return filesystem_type::devfs;
-    if (name.find("fuse") != std::string::npos) return filesystem_type::fuse;
+    if (name == "apfs") {
+        return filesystem_type::apfs;
+    }
+    if (name == "hfs" || name == "hfs+") {
+        return filesystem_type::hfs_plus;
+    }
+    if (name == "msdos" || name == "fat32") {
+        return filesystem_type::fat32;
+    }
+    if (name == "exfat") {
+        return filesystem_type::exfat;
+    }
+    if (name == "ntfs") {
+        return filesystem_type::ntfs;
+    }
+    if (name == "nfs") {
+        return filesystem_type::nfs;
+    }
+    if (name == "smbfs" || name == "cifs") {
+        return filesystem_type::smb;
+    }
+    if (name == "webdav") {
+        return filesystem_type::webdav;
+    }
+    if (name == "devfs") {
+        return filesystem_type::devfs;
+    }
+    if (name.find("fuse") != std::string::npos) {
+        return filesystem_type::fuse;
+    }
 
     return filesystem_type::unknown;
 }
@@ -335,7 +355,9 @@ result<std::vector<removable_device_info>> list_removable_devices_impl() noexcep
     const path volumes_path("/Volumes");
     try {
         for (const auto &entry : std::filesystem::directory_iterator(volumes_path)) {
-            if (!entry.is_directory()) continue;
+            if (!entry.is_directory()) {
+                continue;
+            }
 
             removable_device_info info;
             info.mount_point = entry.path();
@@ -365,7 +387,9 @@ result<std::vector<removable_device_info>> list_removable_devices_impl() noexcep
 
 result<removable_device_info> get_removable_device_info_impl(const path &p) noexcept {
     auto devices = list_removable_devices_impl();
-    if (!devices) return std::unexpected(devices.error());
+    if (!devices) {
+        return std::unexpected(devices.error());
+    }
 
     std::string path_str = p.string();
     for (const auto &dev : *devices) {
@@ -393,11 +417,21 @@ result<bool> is_media_present_impl(const path &p) noexcept {
 result<bool> is_cloud_path_impl(const path &p) noexcept {
     std::string path_str = p.string();
 
-    if (path_str.find("Dropbox") != std::string::npos) return true;
-    if (path_str.find("Google Drive") != std::string::npos) return true;
-    if (path_str.find("OneDrive") != std::string::npos) return true;
-    if (path_str.find("iCloud") != std::string::npos) return true;
-    if (path_str.find("Mobile Documents") != std::string::npos) return true;
+    if (path_str.find("Dropbox") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("Google Drive") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("OneDrive") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("iCloud") != std::string::npos) {
+        return true;
+    }
+    if (path_str.find("Mobile Documents") != std::string::npos) {
+        return true;
+    }
 
     return false;
 }
@@ -405,11 +439,18 @@ result<bool> is_cloud_path_impl(const path &p) noexcept {
 result<cloud_provider> get_cloud_provider_impl(const path &p) noexcept {
     std::string path_str = p.string();
 
-    if (path_str.find("Dropbox") != std::string::npos) return cloud_provider::dropbox;
-    if (path_str.find("Google Drive") != std::string::npos) return cloud_provider::google_drive;
-    if (path_str.find("OneDrive") != std::string::npos) return cloud_provider::onedrive;
-    if (path_str.find("iCloud") != std::string::npos || path_str.find("Mobile Documents") != std::string::npos)
+    if (path_str.find("Dropbox") != std::string::npos) {
+        return cloud_provider::dropbox;
+    }
+    if (path_str.find("Google Drive") != std::string::npos) {
+        return cloud_provider::google_drive;
+    }
+    if (path_str.find("OneDrive") != std::string::npos) {
+        return cloud_provider::onedrive;
+    }
+    if (path_str.find("iCloud") != std::string::npos || path_str.find("Mobile Documents") != std::string::npos) {
         return cloud_provider::icloud;
+    }
 
     return cloud_provider::unknown;
 }
@@ -417,7 +458,9 @@ result<cloud_provider> get_cloud_provider_impl(const path &p) noexcept {
 result<cloud_storage_info> get_cloud_storage_info_impl(const path &p) noexcept {
     cloud_storage_info info;
     auto provider = get_cloud_provider_impl(p);
-    if (provider) info.provider = *provider;
+    if (provider) {
+        info.provider = *provider;
+    }
 
     if (info.provider == cloud_provider::unknown) {
         return std::unexpected(make_error(std::errc::no_such_file_or_directory));
@@ -476,18 +519,26 @@ result<std::vector<cloud_storage_info>> list_cloud_mounts_impl() noexcept {
 
 result<bool> is_virtual_filesystem_impl(const path &p) noexcept {
     auto mount = find_mount_for_path(p);
-    if (!mount) return false;
+    if (!mount) {
+        return false;
+    }
 
     const std::string &fs = mount->fs_type;
-    if (fs.find("fuse") == 0 || fs == "osxfuse" || fs == "macfuse") return true;
-    if (fs == "devfs" || fs == "autofs") return true;
+    if (fs.find("fuse") == 0 || fs == "osxfuse" || fs == "macfuse") {
+        return true;
+    }
+    if (fs == "devfs" || fs == "autofs") {
+        return true;
+    }
 
     return false;
 }
 
 result<bool> is_fuse_mount_impl(const path &p) noexcept {
     auto mount = find_mount_for_path(p);
-    if (!mount) return false;
+    if (!mount) {
+        return false;
+    }
 
     const std::string &fs = mount->fs_type;
     return fs.find("fuse") == 0 || fs == "osxfuse" || fs == "macfuse";
@@ -495,7 +546,9 @@ result<bool> is_fuse_mount_impl(const path &p) noexcept {
 
 result<bool> is_encrypted_mount_impl(const path &p) noexcept {
     auto mount = find_mount_for_path(p);
-    if (!mount) return false;
+    if (!mount) {
+        return false;
+    }
 
     // Check for encrypted APFS volumes
     const std::string &fs = mount->fs_type;
@@ -564,14 +617,30 @@ storage_location_type get_storage_type_macos(const std::string &fs_type, const s
 }
 
 filesystem_type get_fs_type_macos(const std::string &fs_name) {
-    if (fs_name == "apfs") return filesystem_type::apfs;
-    if (fs_name == "hfs") return filesystem_type::hfs_plus;
-    if (fs_name == "msdos") return filesystem_type::fat32;
-    if (fs_name == "exfat") return filesystem_type::exfat;
-    if (fs_name == "ntfs") return filesystem_type::ntfs;
-    if (fs_name == "nfs") return filesystem_type::nfs;
-    if (fs_name == "smbfs") return filesystem_type::smb;
-    if (fs_name == "afpfs") return filesystem_type::cifs;
+    if (fs_name == "apfs") {
+        return filesystem_type::apfs;
+    }
+    if (fs_name == "hfs") {
+        return filesystem_type::hfs_plus;
+    }
+    if (fs_name == "msdos") {
+        return filesystem_type::fat32;
+    }
+    if (fs_name == "exfat") {
+        return filesystem_type::exfat;
+    }
+    if (fs_name == "ntfs") {
+        return filesystem_type::ntfs;
+    }
+    if (fs_name == "nfs") {
+        return filesystem_type::nfs;
+    }
+    if (fs_name == "smbfs") {
+        return filesystem_type::smb;
+    }
+    if (fs_name == "afpfs") {
+        return filesystem_type::cifs;
+    }
     return filesystem_type::unknown;
 }
 } // namespace
@@ -590,7 +659,9 @@ result<std::vector<mount_point_info>> list_all_mounts_impl() noexcept {
 
         // Determine parent mount
         for (const auto &other : entries) {
-            if (other.mount_point == entry.mount_point) continue;
+            if (other.mount_point == entry.mount_point) {
+                continue;
+            }
             std::string other_mp = other.mount_point;
             std::string this_mp = entry.mount_point;
             if (this_mp.starts_with(other_mp) && (other_mp == "/" || this_mp[other_mp.length()] == '/')) {
@@ -609,10 +680,14 @@ result<std::vector<mount_point_info>> list_all_mounts_impl() noexcept {
 result<mount_point_info> get_mount_point_info_impl(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts_impl();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     mount_point_info best_match;
     size_t best_len = 0;
@@ -640,10 +715,14 @@ result<mount_point_info> get_mount_point_info_impl(const path &p) noexcept {
 result<bool> is_mount_point_impl(const path &p) noexcept {
     std::error_code ec;
     path abs_path = std::filesystem::absolute(p, ec);
-    if (ec) return std::unexpected(make_error(ec.value(), ec.category()));
+    if (ec) {
+        return std::unexpected(make_error(ec.value(), ec.category()));
+    }
 
     auto all_mounts = list_all_mounts_impl();
-    if (!all_mounts) return std::unexpected(all_mounts.error());
+    if (!all_mounts) {
+        return std::unexpected(all_mounts.error());
+    }
 
     std::string path_str = abs_path.string();
     for (const auto &m : *all_mounts) {

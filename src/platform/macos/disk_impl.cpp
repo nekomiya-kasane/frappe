@@ -39,8 +39,12 @@ result<std::vector<disk_info>> list_disks_impl() noexcept {
         std::string name = entry->d_name;
 
         // Match disk devices (disk0, disk1, etc.) but not partitions (disk0s1)
-        if (name.find("disk") != 0) continue;
-        if (name.find('s') != std::string::npos) continue; // Skip partitions
+        if (name.find("disk") != 0) {
+            continue;
+        }
+        if (name.find('s') != std::string::npos) {
+            continue; // Skip partitions
+        }
 
         disk_info info;
         info.device_path = "/dev/" + name;
@@ -74,7 +78,9 @@ result<std::vector<disk_info>> list_disks_impl() noexcept {
 
 result<disk_info> get_disk_info_impl(std::string_view device_path) noexcept {
     auto disks = list_disks_impl();
-    if (!disks) return std::unexpected(disks.error());
+    if (!disks) {
+        return std::unexpected(disks.error());
+    }
 
     for (const auto &d : *disks) {
         if (d.device_path == device_path) {
@@ -140,7 +146,9 @@ result<partition_table_info> get_partition_table_impl(std::string_view device_pa
         std::string name = entry->d_name;
 
         // Match partitions (disk0s1, disk0s2, etc.)
-        if (name.find(disk_name + "s") != 0) continue;
+        if (name.find(disk_name + "s") != 0) {
+            continue;
+        }
 
         partition_info pinfo;
         pinfo.device_path = "/dev/" + name;
@@ -196,7 +204,9 @@ result<partition_info> get_partition_info_impl(const path &p) noexcept {
     }
 
     auto table = get_partition_table_impl(disk_device);
-    if (!table) return std::unexpected(table.error());
+    if (!table) {
+        return std::unexpected(table.error());
+    }
 
     for (const auto &part : table->partitions) {
         if (part.device_path == device) {
@@ -211,7 +221,9 @@ result<std::vector<partition_info>> list_partitions_impl() noexcept {
     std::vector<partition_info> all_partitions;
 
     auto disks = list_disks_impl();
-    if (!disks) return std::unexpected(disks.error());
+    if (!disks) {
+        return std::unexpected(disks.error());
+    }
 
     for (const auto &disk : *disks) {
         auto table = get_partition_table_impl(disk.device_path);
@@ -227,7 +239,9 @@ result<std::vector<partition_info>> list_partitions_impl() noexcept {
 
 result<std::string> get_containing_device_impl(const path &p) noexcept {
     auto disk = get_disk_for_path_impl(p);
-    if (!disk) return std::unexpected(disk.error());
+    if (!disk) {
+        return std::unexpected(disk.error());
+    }
     return disk->device_path;
 }
 
@@ -355,28 +369,29 @@ result<virtual_disk_info> get_virtual_disk_info_impl(const path &p) noexcept {
         c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
 
-    if (ext == ".dmg")
+    if (ext == ".dmg") {
         info.type = virtual_disk_type::dmg;
-    else if (ext == ".iso")
+    } else if (ext == ".iso") {
         info.type = virtual_disk_type::iso;
-    else if (ext == ".vhd")
+    } else if (ext == ".vhd") {
         info.type = virtual_disk_type::vhd;
-    else if (ext == ".vhdx")
+    } else if (ext == ".vhdx") {
         info.type = virtual_disk_type::vhdx;
-    else if (ext == ".vmdk")
+    } else if (ext == ".vmdk") {
         info.type = virtual_disk_type::vmdk;
-    else if (ext == ".vdi")
+    } else if (ext == ".vdi") {
         info.type = virtual_disk_type::vdi;
-    else if (ext == ".qcow" || ext == ".qcow2")
+    } else if (ext == ".qcow" || ext == ".qcow2") {
         info.type = virtual_disk_type::qcow2;
-    else if (ext == ".img")
+    } else if (ext == ".img") {
         info.type = virtual_disk_type::img;
-    else if (ext == ".raw")
+    } else if (ext == ".raw") {
         info.type = virtual_disk_type::raw;
-    else if (ext == ".sparseimage" || ext == ".sparsebundle")
+    } else if (ext == ".sparseimage" || ext == ".sparsebundle") {
         info.type = virtual_disk_type::sparse;
-    else
+    } else {
         info.type = virtual_disk_type::unknown;
+    }
 
     info.virtual_size = info.actual_size;
 

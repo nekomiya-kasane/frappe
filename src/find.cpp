@@ -116,7 +116,9 @@ find_options &find_options::is_socket() {
 find_options &find_options::size_eq(std::uintmax_t size) {
     _conditions.push_back({[size](const std::filesystem::directory_entry &e) {
         std::error_code ec;
-        if (!e.is_regular_file(ec)) return false;
+        if (!e.is_regular_file(ec)) {
+            return false;
+        }
         return e.file_size(ec) == size;
     }});
     return *this;
@@ -125,7 +127,9 @@ find_options &find_options::size_eq(std::uintmax_t size) {
 find_options &find_options::size_gt(std::uintmax_t size) {
     _conditions.push_back({[size](const std::filesystem::directory_entry &e) {
         std::error_code ec;
-        if (!e.is_regular_file(ec)) return false;
+        if (!e.is_regular_file(ec)) {
+            return false;
+        }
         return e.file_size(ec) > size;
     }});
     return *this;
@@ -134,7 +138,9 @@ find_options &find_options::size_gt(std::uintmax_t size) {
 find_options &find_options::size_lt(std::uintmax_t size) {
     _conditions.push_back({[size](const std::filesystem::directory_entry &e) {
         std::error_code ec;
-        if (!e.is_regular_file(ec)) return false;
+        if (!e.is_regular_file(ec)) {
+            return false;
+        }
         return e.file_size(ec) < size;
     }});
     return *this;
@@ -143,7 +149,9 @@ find_options &find_options::size_lt(std::uintmax_t size) {
 find_options &find_options::size_range(std::uintmax_t min_size, std::uintmax_t max_size) {
     _conditions.push_back({[min_size, max_size](const std::filesystem::directory_entry &e) {
         std::error_code ec;
-        if (!e.is_regular_file(ec)) return false;
+        if (!e.is_regular_file(ec)) {
+            return false;
+        }
         auto sz = e.file_size(ec);
         return sz >= min_size && sz <= max_size;
     }});

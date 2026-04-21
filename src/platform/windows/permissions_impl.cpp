@@ -72,7 +72,9 @@ std::vector<BYTE> get_sid_from_name(std::string_view name) {
     SID_NAME_USE sid_type;
 
     LookupAccountNameW(nullptr, wname.c_str(), nullptr, &sid_size, nullptr, &domain_size, &sid_type);
-    if (sid_size == 0) return {};
+    if (sid_size == 0) {
+        return {};
+    }
 
     std::vector<BYTE> sid_buffer(sid_size);
     std::vector<wchar_t> domain_buffer(domain_size);
@@ -101,7 +103,9 @@ std::optional<std::string> get_name_from_sid(PSID sid) {
 
 // Get RID (Relative Identifier) from SID as a pseudo-UID
 std::uint32_t get_rid_from_sid(PSID sid) {
-    if (!IsValidSid(sid)) return 0;
+    if (!IsValidSid(sid)) {
+        return 0;
+    }
     DWORD sub_auth_count = *GetSidSubAuthorityCount(sid);
     if (sub_auth_count > 0) {
         return *GetSidSubAuthority(sid, sub_auth_count - 1);
@@ -112,7 +116,9 @@ std::uint32_t get_rid_from_sid(PSID sid) {
 
 std::optional<std::uint32_t> user_id_from_name_impl(std::string_view name) noexcept {
     auto sid_buffer = get_sid_from_name(name);
-    if (sid_buffer.empty()) return std::nullopt;
+    if (sid_buffer.empty()) {
+        return std::nullopt;
+    }
 
     PSID sid = reinterpret_cast<PSID>(sid_buffer.data());
     return get_rid_from_sid(sid);
@@ -127,7 +133,9 @@ std::optional<std::string> user_name_from_id_impl(std::uint32_t uid) noexcept {
 
 std::optional<std::uint32_t> group_id_from_name_impl(std::string_view name) noexcept {
     auto sid_buffer = get_sid_from_name(name);
-    if (sid_buffer.empty()) return std::nullopt;
+    if (sid_buffer.empty()) {
+        return std::nullopt;
+    }
 
     PSID sid = reinterpret_cast<PSID>(sid_buffer.data());
     return get_rid_from_sid(sid);
@@ -302,16 +310,24 @@ result<access_rights> get_effective_rights_impl(const path &p) noexcept {
     access_rights result = access_rights::none;
 
     auto read_check = check_access_impl(p, access_rights::read);
-    if (read_check && *read_check) result = result | access_rights::read;
+    if (read_check && *read_check) {
+        result = result | access_rights::read;
+    }
 
     auto write_check = check_access_impl(p, access_rights::write);
-    if (write_check && *write_check) result = result | access_rights::write;
+    if (write_check && *write_check) {
+        result = result | access_rights::write;
+    }
 
     auto exec_check = check_access_impl(p, access_rights::execute);
-    if (exec_check && *exec_check) result = result | access_rights::execute;
+    if (exec_check && *exec_check) {
+        result = result | access_rights::execute;
+    }
 
     auto del_check = check_access_impl(p, access_rights::_delete);
-    if (del_check && *del_check) result = result | access_rights::_delete;
+    if (del_check && *del_check) {
+        result = result | access_rights::_delete;
+    }
 
     std::error_code ec;
     if (std::filesystem::is_directory(p, ec)) {
@@ -355,14 +371,20 @@ acl_entry parse_ace(ACCESS_ALLOWED_ACE *allowed_ace) {
 
 void parse_dacl_entries(PACL dacl, acl_info &info) {
     ACL_SIZE_INFORMATION acl_size;
-    if (!GetAclInformation(dacl, &acl_size, sizeof(acl_size), AclSizeInformation)) return;
+    if (!GetAclInformation(dacl, &acl_size, sizeof(acl_size), AclSizeInformation)) {
+        return;
+    }
 
     for (DWORD i = 0; i < acl_size.AceCount; ++i) {
         LPVOID ace = nullptr;
-        if (!GetAce(dacl, i, &ace)) continue;
+        if (!GetAce(dacl, i, &ace)) {
+            continue;
+        }
 
         ACE_HEADER *header = static_cast<ACE_HEADER *>(ace);
-        if (header->AceType != ACCESS_ALLOWED_ACE_TYPE) continue;
+        if (header->AceType != ACCESS_ALLOWED_ACE_TYPE) {
+            continue;
+        }
 
         info.entries.push_back(parse_ace(static_cast<ACCESS_ALLOWED_ACE *>(ace)));
     }
@@ -446,27 +468,41 @@ void_result set_acl_impl(const path &p, const acl_info &acl, acl_type type) noex
     // Allocate and initialize ACL
     PACL new_acl = static_cast<PACL>(LocalAlloc(LPTR, acl_size));
     if (!new_acl) {
-        for (auto sid : sids) LocalFree(sid);
+        for (auto sid : sids) {
+            LocalFree(sid);
+        }
         return std::unexpected(make_error(std::errc::not_enough_memory));
     }
 
     if (!InitializeAcl(new_acl, acl_size, ACL_REVISION)) {
         LocalFree(new_acl);
-        for (auto sid : sids) LocalFree(sid);
+        for (auto sid : sids) {
+            LocalFree(sid);
+        }
         return std::unexpected(make_error(static_cast<int>(GetLastError()), std::system_category()));
     }
 
     // Add ACEs
     size_t sid_idx = 0;
     for (const auto &entry : acl.entries) {
-        if (sid_idx >= sids.size()) break;
+        if (sid_idx >= sids.size()) {
+            break;
+        }
         PSID sid = sids[sid_idx++];
-        if (!sid) continue;
+        if (!sid) {
+            continue;
+        }
 
         ACCESS_MASK mask = 0;
-        if (entry.read) mask |= FILE_GENERIC_READ;
-        if (entry.write) mask |= FILE_GENERIC_WRITE;
-        if (entry.execute) mask |= FILE_GENERIC_EXECUTE;
+        if (entry.read) {
+            mask |= FILE_GENERIC_READ;
+        }
+        if (entry.write) {
+            mask |= FILE_GENERIC_WRITE;
+        }
+        if (entry.execute) {
+            mask |= FILE_GENERIC_EXECUTE;
+        }
 
         if (!AddAccessAllowedAce(new_acl, ACL_REVISION, mask, sid)) {
             // Continue even if one ACE fails
@@ -478,7 +514,9 @@ void_result set_acl_impl(const path &p, const acl_info &acl, acl_type type) noex
                                       nullptr, nullptr, new_acl, nullptr);
 
     LocalFree(new_acl);
-    for (auto sid : sids) LocalFree(sid);
+    for (auto sid : sids) {
+        LocalFree(sid);
+    }
 
     if (res != ERROR_SUCCESS) {
         return std::unexpected(make_error(static_cast<int>(res), std::system_category()));
@@ -488,7 +526,9 @@ void_result set_acl_impl(const path &p, const acl_info &acl, acl_type type) noex
 
 result<bool> has_acl_impl(const path &p) noexcept {
     auto acl = get_acl_impl(p, acl_type::access);
-    if (!acl) return std::unexpected(acl.error());
+    if (!acl) {
+        return std::unexpected(acl.error());
+    }
     return !acl->entries.empty();
 }
 

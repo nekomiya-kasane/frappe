@@ -366,7 +366,9 @@ inline const auto with_xattr = filter([](const file_entry &e) { return e.has_xat
 [[nodiscard]] inline auto name_icase(std::string_view str) {
     std::string s(str);
     return filter([s = std::move(s)](const file_entry &e) {
-        if (e.name.size() != s.size()) return false;
+        if (e.name.size() != s.size()) {
+            return false;
+        }
         return std::equal(e.name.begin(), e.name.end(), s.begin(), s.end(),
                           [](char a, char b) { return std::tolower(a) == std::tolower(b); });
     });
@@ -380,7 +382,9 @@ inline const auto with_xattr = filter([](const file_entry &e) { return e.has_xat
 [[nodiscard]] inline auto stem_icase(std::string_view str) {
     std::string s(str);
     return filter([s = std::move(s)](const file_entry &e) {
-        if (e.stem.size() != s.size()) return false;
+        if (e.stem.size() != s.size()) {
+            return false;
+        }
         return std::equal(e.stem.begin(), e.stem.end(), s.begin(), s.end(),
                           [](char a, char b) { return std::tolower(a) == std::tolower(b); });
     });
@@ -440,7 +444,9 @@ inline const auto with_xattr = filter([](const file_entry &e) { return e.has_xat
             return false;
         }
         std::ifstream file(e.file_path, std::ios::binary);
-        if (!file) return false;
+        if (!file) {
+            return false;
+        }
         std::vector<char> buffer(magic_bytes.size());
         file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
         if (file.gcount() != static_cast<std::streamsize>(magic_bytes.size())) {

@@ -129,21 +129,37 @@ void set_umask_impl(perms mask) noexcept {
 
 result<bool> check_access_impl(const path &p, access_rights rights) noexcept {
     int mode = F_OK;
-    if (has_right(rights, access_rights::read)) mode |= R_OK;
-    if (has_right(rights, access_rights::write)) mode |= W_OK;
-    if (has_right(rights, access_rights::execute)) mode |= X_OK;
+    if (has_right(rights, access_rights::read)) {
+        mode |= R_OK;
+    }
+    if (has_right(rights, access_rights::write)) {
+        mode |= W_OK;
+    }
+    if (has_right(rights, access_rights::execute)) {
+        mode |= X_OK;
+    }
 
-    if (access(p.c_str(), mode) == 0) return true;
-    if (errno == EACCES) return false;
+    if (access(p.c_str(), mode) == 0) {
+        return true;
+    }
+    if (errno == EACCES) {
+        return false;
+    }
     return std::unexpected(make_error(errno, std::system_category()));
 }
 
 result<access_rights> get_effective_rights_impl(const path &p) noexcept {
     access_rights result = access_rights::none;
 
-    if (access(p.c_str(), R_OK) == 0) result = result | access_rights::read;
-    if (access(p.c_str(), W_OK) == 0) result = result | access_rights::write;
-    if (access(p.c_str(), X_OK) == 0) result = result | access_rights::execute;
+    if (access(p.c_str(), R_OK) == 0) {
+        result = result | access_rights::read;
+    }
+    if (access(p.c_str(), W_OK) == 0) {
+        result = result | access_rights::write;
+    }
+    if (access(p.c_str(), X_OK) == 0) {
+        result = result | access_rights::execute;
+    }
 
     struct stat st;
     if (stat(p.c_str(), &st) == 0) {
