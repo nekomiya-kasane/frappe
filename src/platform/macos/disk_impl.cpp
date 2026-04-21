@@ -1,13 +1,13 @@
 #ifdef FRAPPE_PLATFORM_MACOS
 
-#include "frappe/disk.hpp"
+#    include "frappe/disk.hpp"
 
-#include <dirent.h>
-#include <fcntl.h>
-#include <sys/mount.h>
-#include <sys/param.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#    include <dirent.h>
+#    include <fcntl.h>
+#    include <sys/mount.h>
+#    include <sys/param.h>
+#    include <sys/stat.h>
+#    include <unistd.h>
 
 namespace frappe::detail {
 

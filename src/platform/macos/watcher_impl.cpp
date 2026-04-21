@@ -2,8 +2,8 @@
 
 #ifdef FRAPPE_PLATFORM_MACOS
 
-#include <CoreServices/CoreServices.h>
-#include <dispatch/dispatch.h>
+#    include <CoreServices/CoreServices.h>
+#    include <dispatch/dispatch.h>
 
 namespace frappe {
 

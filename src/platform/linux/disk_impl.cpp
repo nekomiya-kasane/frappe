@@ -1,17 +1,17 @@
 #ifdef FRAPPE_PLATFORM_LINUX
 
-#include "frappe/disk.hpp"
+#    include "frappe/disk.hpp"
 
-#include <dirent.h>
-#include <fcntl.h>
-#include <fstream>
-#include <linux/fs.h>
-#include <mntent.h>
-#include <sstream>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/sysmacros.h>
-#include <unistd.h>
+#    include <dirent.h>
+#    include <fcntl.h>
+#    include <fstream>
+#    include <linux/fs.h>
+#    include <mntent.h>
+#    include <sstream>
+#    include <sys/ioctl.h>
+#    include <sys/stat.h>
+#    include <sys/sysmacros.h>
+#    include <unistd.h>
 
 namespace frappe::detail {
 

@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <set>
 #ifdef _WIN32
-#include <windows.h>
+#    include <windows.h>
 #endif
 
 using namespace frappe;

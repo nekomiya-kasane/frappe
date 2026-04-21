@@ -15,8 +15,8 @@
 #include <string_view>
 #include <vector>
 #if __has_include(<generator>)
-#include <generator>
-#define FRAPPE_HAS_GENERATOR 1
+#    include <generator>
+#    define FRAPPE_HAS_GENERATOR 1
 #endif
 
 namespace frappe {

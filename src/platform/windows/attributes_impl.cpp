@@ -1,11 +1,11 @@
 #ifdef FRAPPE_PLATFORM_WINDOWS
 
-#define NOMINMAX
-#include "frappe/attributes.hpp"
+#    define NOMINMAX
+#    include "frappe/attributes.hpp"
 
-#include <Windows.h>
-#include <string>
-#include <vector>
+#    include <Windows.h>
+#    include <string>
+#    include <vector>
 
 namespace frappe::detail {
 

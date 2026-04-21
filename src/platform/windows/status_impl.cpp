@@ -1,9 +1,9 @@
 #ifdef FRAPPE_PLATFORM_WINDOWS
 
-#define NOMINMAX
-#include "frappe/status.hpp"
+#    define NOMINMAX
+#    include "frappe/status.hpp"
 
-#include <Windows.h>
+#    include <Windows.h>
 
 namespace frappe::detail {
 

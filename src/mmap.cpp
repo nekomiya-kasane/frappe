@@ -3,13 +3,13 @@
 #include <algorithm>
 
 #ifdef _WIN32
-#define NOMINMAX
-#include <windows.h>
+#    define NOMINMAX
+#    include <windows.h>
 #else
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#    include <fcntl.h>
+#    include <sys/mman.h>
+#    include <sys/stat.h>
+#    include <unistd.h>
 #endif
 
 namespace frappe {
@@ -477,7 +477,7 @@ namespace frappe {
         return {};
 #else
         // Try mremap first (Linux-specific)
-#ifdef __linux__
+#    ifdef __linux__
         void *new_addr = mremap(_impl->data, _impl->size, new_size, MREMAP_MAYMOVE);
         if (new_addr != MAP_FAILED) {
             _impl->data = static_cast<std::byte *>(new_addr);
@@ -488,7 +488,7 @@ namespace frappe {
             }
             return {};
         }
-#endif
+#    endif
 
         // Fallback: unmap, resize file, remap
         munmap(_impl->data, _impl->size);

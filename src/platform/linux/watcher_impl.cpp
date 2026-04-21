@@ -2,11 +2,11 @@
 
 #ifdef FRAPPE_PLATFORM_LINUX
 
-#include <cstring>
-#include <errno.h>
-#include <sys/inotify.h>
-#include <sys/select.h>
-#include <unistd.h>
+#    include <cstring>
+#    include <errno.h>
+#    include <sys/inotify.h>
+#    include <sys/select.h>
+#    include <unistd.h>
 
 namespace frappe {
 

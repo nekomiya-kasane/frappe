@@ -2,11 +2,11 @@
 
 #ifdef FRAPPE_PLATFORM_MACOS
 
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/file.h>
-#include <thread>
-#include <unistd.h>
+#    include <errno.h>
+#    include <fcntl.h>
+#    include <sys/file.h>
+#    include <thread>
+#    include <unistd.h>
 
 namespace frappe {
 

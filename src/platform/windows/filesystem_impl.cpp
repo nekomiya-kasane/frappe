@@ -1,14 +1,14 @@
 #ifdef FRAPPE_PLATFORM_WINDOWS
 
-#define NOMINMAX
-#include "frappe/filesystem.hpp"
+#    define NOMINMAX
+#    include "frappe/filesystem.hpp"
 
-#include <Windows.h>
-#include <algorithm>
-#include <cctype>
-#include <winnetwk.h>
+#    include <Windows.h>
+#    include <algorithm>
+#    include <cctype>
+#    include <winnetwk.h>
 
-#pragma comment(lib, "mpr.lib")
+#    pragma comment(lib, "mpr.lib")
 
 namespace frappe::detail {
 

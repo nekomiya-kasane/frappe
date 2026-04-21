@@ -1,13 +1,13 @@
 #ifdef FRAPPE_PLATFORM_LINUX
 
-#include "frappe/permissions.hpp"
+#    include "frappe/permissions.hpp"
 
-#include <cstring>
-#include <grp.h>
-#include <pwd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#    include <cstring>
+#    include <grp.h>
+#    include <pwd.h>
+#    include <sys/stat.h>
+#    include <sys/types.h>
+#    include <unistd.h>
 
 namespace frappe::detail {
 

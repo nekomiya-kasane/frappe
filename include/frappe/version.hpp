@@ -8,13 +8,13 @@
 #include <string_view>
 
 #ifndef FRAPPE_VERSION_MAJOR
-#define FRAPPE_VERSION_MAJOR 0
+#    define FRAPPE_VERSION_MAJOR 0
 #endif
 #ifndef FRAPPE_VERSION_MINOR
-#define FRAPPE_VERSION_MINOR 1
+#    define FRAPPE_VERSION_MINOR 1
 #endif
 #ifndef FRAPPE_VERSION_PATCH
-#define FRAPPE_VERSION_PATCH 0
+#    define FRAPPE_VERSION_PATCH 0
 #endif
 
 namespace frappe::version {

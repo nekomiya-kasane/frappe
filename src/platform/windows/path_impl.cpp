@@ -1,10 +1,10 @@
 #ifdef FRAPPE_PLATFORM_WINDOWS
 
-#include "frappe/path.hpp"
+#    include "frappe/path.hpp"
 
-#include <ShlObj.h>
-#include <Windows.h>
-#include <array>
+#    include <ShlObj.h>
+#    include <Windows.h>
+#    include <array>
 
 namespace frappe::detail {
 

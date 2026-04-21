@@ -1,11 +1,11 @@
 #ifdef FRAPPE_PLATFORM_MACOS
 
-#include "frappe/status.hpp"
+#    include "frappe/status.hpp"
 
-#include <limits.h>
-#include <sys/stat.h>
-#include <sys/statvfs.h>
-#include <unistd.h>
+#    include <limits.h>
+#    include <sys/stat.h>
+#    include <sys/statvfs.h>
+#    include <unistd.h>
 
 namespace frappe::detail {
 

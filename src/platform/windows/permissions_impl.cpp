@@ -1,17 +1,17 @@
 #ifdef FRAPPE_PLATFORM_WINDOWS
 
-#define NOMINMAX
-#include "frappe/permissions.hpp"
+#    define NOMINMAX
+#    include "frappe/permissions.hpp"
 
-#include <Lmcons.h>
-#include <Windows.h>
-#include <aclapi.h>
-#include <io.h>
-#include <lm.h>
-#include <sddl.h>
+#    include <Lmcons.h>
+#    include <Windows.h>
+#    include <aclapi.h>
+#    include <io.h>
+#    include <lm.h>
+#    include <sddl.h>
 
-#pragma comment(lib, "advapi32.lib")
-#pragma comment(lib, "netapi32.lib")
+#    pragma comment(lib, "advapi32.lib")
+#    pragma comment(lib, "netapi32.lib")
 
 namespace frappe::detail {
 

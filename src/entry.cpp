@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #ifdef _WIN32
-#include <windows.h>
+#    include <windows.h>
 #endif
 
 namespace frappe {

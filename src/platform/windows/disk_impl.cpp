@@ -1,16 +1,18 @@
 #ifdef FRAPPE_PLATFORM_WINDOWS
 
-#define NOMINMAX
-#include "frappe/disk.hpp"
+#    ifndef NOMINMAX
+#        define NOMINMAX
+#    endif
+#    include "frappe/disk.hpp"
 
-#include <Windows.h>
-#include <cfgmgr32.h>
-#include <devguid.h>
-#include <ntddscsi.h>
-#include <setupapi.h>
-#include <winioctl.h>
+#    include <Windows.h>
+#    include <cfgmgr32.h>
+#    include <devguid.h>
+#    include <ntddscsi.h>
+#    include <setupapi.h>
+#    include <winioctl.h>
 
-#pragma comment(lib, "setupapi.lib")
+#    pragma comment(lib, "setupapi.lib")
 
 namespace frappe::detail {
 

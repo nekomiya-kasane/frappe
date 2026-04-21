@@ -1,13 +1,13 @@
 #ifdef FRAPPE_PLATFORM_LINUX
 
-#include "frappe/path.hpp"
+#    include "frappe/path.hpp"
 
-#include <array>
-#include <climits>
-#include <cstdlib>
-#include <pwd.h>
-#include <sys/types.h>
-#include <unistd.h>
+#    include <array>
+#    include <climits>
+#    include <cstdlib>
+#    include <pwd.h>
+#    include <sys/types.h>
+#    include <unistd.h>
 
 namespace frappe::detail {
 

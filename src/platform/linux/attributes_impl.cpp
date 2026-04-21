@@ -1,10 +1,10 @@
 #ifdef FRAPPE_PLATFORM_LINUX
 
-#include "frappe/attributes.hpp"
+#    include "frappe/attributes.hpp"
 
-#include <cerrno>
-#include <cstring>
-#include <sys/xattr.h>
+#    include <cerrno>
+#    include <cstring>
+#    include <sys/xattr.h>
 
 namespace frappe::detail {
 

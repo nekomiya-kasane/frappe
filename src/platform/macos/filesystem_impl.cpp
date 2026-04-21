@@ -1,12 +1,12 @@
 #ifdef FRAPPE_PLATFORM_MACOS
 
-#include "frappe/filesystem.hpp"
+#    include "frappe/filesystem.hpp"
 
-#include <cstring>
-#include <fstream>
-#include <sys/mount.h>
-#include <sys/param.h>
-#include <sys/statvfs.h>
+#    include <cstring>
+#    include <fstream>
+#    include <sys/mount.h>
+#    include <sys/param.h>
+#    include <sys/statvfs.h>
 
 namespace frappe::detail {
 

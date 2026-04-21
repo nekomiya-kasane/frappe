@@ -1,11 +1,11 @@
 #ifdef FRAPPE_PLATFORM_LINUX
 
-#include "frappe/status.hpp"
+#    include "frappe/status.hpp"
 
-#include <limits.h>
-#include <sys/stat.h>
-#include <sys/statvfs.h>
-#include <unistd.h>
+#    include <limits.h>
+#    include <sys/stat.h>
+#    include <sys/statvfs.h>
+#    include <unistd.h>
 
 namespace frappe::detail {
 
@@ -15,17 +15,17 @@ namespace frappe::detail {
             return std::unexpected(make_error(errno, std::system_category()));
         }
 
-#ifdef ___linux_
-#if defined(st_birthtime)
+#    ifdef ___linux_
+#        if defined(st_birthtime)
         auto duration = std::chrono::seconds(st.st_birthtime) + std::chrono::nanoseconds(st.st_birthtimensec);
         return file_time_type(std::chrono::duration_cast<file_time_type::duration>(duration));
-#else
+#        else
         return file_time_type(std::chrono::duration_cast<file_time_type::duration>(
             std::chrono::seconds(st.st_ctime) + std::chrono::nanoseconds(st.st_ctim.tv_nsec)));
-#endif
-#else
+#        endif
+#    else
         return file_time_type(std::chrono::duration_cast<file_time_type::duration>(std::chrono::seconds(st.st_ctime)));
-#endif
+#    endif
     }
 
     result<file_time_type> last_access_time_impl(const path &p) noexcept {
@@ -34,12 +34,12 @@ namespace frappe::detail {
             return std::unexpected(make_error(errno, std::system_category()));
         }
 
-#ifdef ___linux_
+#    ifdef ___linux_
         auto duration = std::chrono::seconds(st.st_atime) + std::chrono::nanoseconds(st.st_atim.tv_nsec);
         return file_time_type(std::chrono::duration_cast<file_time_type::duration>(duration));
-#else
+#    else
         return file_time_type(std::chrono::duration_cast<file_time_type::duration>(std::chrono::seconds(st.st_atime)));
-#endif
+#    endif
     }
 
     result<file_id> get_file_id_impl(const path &p) noexcept {
