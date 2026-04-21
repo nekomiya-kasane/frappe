@@ -336,18 +336,18 @@ template <> struct std::formatter<frappe::file_entry> {
 // ============================================================================
 
 namespace frappe::fmt {
-// ls-style formats
-inline constexpr std::string_view ls_short = "{:n}";
-inline constexpr std::string_view ls_long = "{:Plogsmn}";
-inline constexpr std::string_view ls_human = "{:Plogsmn:h}";
-inline constexpr std::string_view ls_inode = "{:iPlogsmn}";
-inline constexpr std::string_view ls_all = "{:iPlogsmn+@L}";
+    // ls-style formats
+    inline constexpr std::string_view ls_short = "{:n}";
+    inline constexpr std::string_view ls_long = "{:Plogsmn}";
+    inline constexpr std::string_view ls_human = "{:Plogsmn:h}";
+    inline constexpr std::string_view ls_inode = "{:iPlogsmn}";
+    inline constexpr std::string_view ls_all = "{:iPlogsmn+@L}";
 
-// Custom formats
-inline constexpr std::string_view name_only = "{:n}";
-inline constexpr std::string_view path_only = "{:p}";
-inline constexpr std::string_view size_name = "{:sn:h}";
-inline constexpr std::string_view time_name = "{:mn}";
+    // Custom formats
+    inline constexpr std::string_view name_only = "{:n}";
+    inline constexpr std::string_view path_only = "{:p}";
+    inline constexpr std::string_view size_name = "{:sn:h}";
+    inline constexpr std::string_view time_name = "{:mn}";
 } // namespace frappe::fmt
 
 #endif // FRAPPE_FORMATTERS_HPP

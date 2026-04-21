@@ -8,27 +8,27 @@ using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0, bool hidden = false) {
-    file_entry e;
-    e.file_path = name;
-    e.name = name;
-    e.stem = std::filesystem::path(name).stem().string();
-    e.extension = std::filesystem::path(name).extension().string();
-    e.type = type;
-    e.size = size;
-    e.is_hidden = hidden;
-    e.permissions = perms::owner_read | perms::owner_write;
-    e.hard_link_count = 1;
-    return e;
-}
+    file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0, bool hidden = false) {
+        file_entry e;
+        e.file_path = name;
+        e.name = name;
+        e.stem = std::filesystem::path(name).stem().string();
+        e.extension = std::filesystem::path(name).extension().string();
+        e.type = type;
+        e.size = size;
+        e.is_hidden = hidden;
+        e.permissions = perms::owner_read | perms::owner_write;
+        e.hard_link_count = 1;
+        return e;
+    }
 
-std::vector<file_entry> sample_entries() {
-    return {
-        make_entry("readme.md", file_type::regular, 1024), make_entry("main.cpp", file_type::regular, 4096),
-        make_entry("build", file_type::directory, 0),      make_entry(".gitignore", file_type::regular, 256, true),
-        make_entry("lib.hpp", file_type::regular, 2048),   make_entry("empty.txt", file_type::regular, 0),
-    };
-}
+    std::vector<file_entry> sample_entries() {
+        return {
+            make_entry("readme.md", file_type::regular, 1024), make_entry("main.cpp", file_type::regular, 4096),
+            make_entry("build", file_type::directory, 0),      make_entry(".gitignore", file_type::regular, 256, true),
+            make_entry("lib.hpp", file_type::regular, 2048),   make_entry("empty.txt", file_type::regular, 0),
+        };
+    }
 
 } // namespace
 

@@ -7,24 +7,24 @@ using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string &name, std::uintmax_t size = 0) {
-    file_entry e;
-    e.file_path = name;
-    e.name = name;
-    e.stem = std::filesystem::path(name).stem().string();
-    e.extension = std::filesystem::path(name).extension().string();
-    e.type = file_type::regular;
-    e.size = size;
-    e.hard_link_count = 1;
-    return e;
-}
+    file_entry make_entry(const std::string &name, std::uintmax_t size = 0) {
+        file_entry e;
+        e.file_path = name;
+        e.name = name;
+        e.stem = std::filesystem::path(name).stem().string();
+        e.extension = std::filesystem::path(name).extension().string();
+        e.type = file_type::regular;
+        e.size = size;
+        e.hard_link_count = 1;
+        return e;
+    }
 
-std::vector<file_entry> sample() {
-    return {
-        make_entry("a.cpp", 100), make_entry("b.cpp", 200), make_entry("c.hpp", 300),
-        make_entry("d.hpp", 400), make_entry("e.txt", 500),
-    };
-}
+    std::vector<file_entry> sample() {
+        return {
+            make_entry("a.cpp", 100), make_entry("b.cpp", 200), make_entry("c.hpp", 300),
+            make_entry("d.hpp", 400), make_entry("e.txt", 500),
+        };
+    }
 
 } // namespace
 

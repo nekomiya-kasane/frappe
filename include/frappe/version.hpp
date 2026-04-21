@@ -19,15 +19,15 @@
 
 namespace frappe::version {
 
-constexpr std::uint32_t major = FRAPPE_VERSION_MAJOR;
-constexpr std::uint32_t minor = FRAPPE_VERSION_MINOR;
-constexpr std::uint32_t patch = FRAPPE_VERSION_PATCH;
+    constexpr std::uint32_t major = FRAPPE_VERSION_MAJOR;
+    constexpr std::uint32_t minor = FRAPPE_VERSION_MINOR;
+    constexpr std::uint32_t patch = FRAPPE_VERSION_PATCH;
 
-[[nodiscard]] FRAPPE_API std::string_view string() noexcept;
+    [[nodiscard]] FRAPPE_API std::string_view string() noexcept;
 
-[[nodiscard]] constexpr std::uint32_t number() noexcept {
-    return major * 10000 + minor * 100 + patch;
-}
+    [[nodiscard]] constexpr std::uint32_t number() noexcept {
+        return major * 10000 + minor * 100 + patch;
+    }
 
 } // namespace frappe::version
 

@@ -7,29 +7,29 @@ using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0, bool hidden = false) {
-    file_entry e;
-    e.file_path = "/tmp/" + name;
-    e.name = name;
-    e.stem = std::filesystem::path(name).stem().string();
-    e.extension = std::filesystem::path(name).extension().string();
-    e.type = type;
-    e.size = size;
-    e.is_hidden = hidden;
-    e.is_symlink = false;
-    e.is_broken_link = false;
-    e.has_acl = false;
-    e.has_xattr = false;
-    e.permissions = perms::owner_read | perms::owner_write;
-    e.hard_link_count = 1;
-    e.inode = 42;
-    e.uid = 1000;
-    e.gid = 1000;
-    e.owner = "user";
-    e.group = "staff";
-    e.mime_type = "text/plain";
-    return e;
-}
+    file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0, bool hidden = false) {
+        file_entry e;
+        e.file_path = "/tmp/" + name;
+        e.name = name;
+        e.stem = std::filesystem::path(name).stem().string();
+        e.extension = std::filesystem::path(name).extension().string();
+        e.type = type;
+        e.size = size;
+        e.is_hidden = hidden;
+        e.is_symlink = false;
+        e.is_broken_link = false;
+        e.has_acl = false;
+        e.has_xattr = false;
+        e.permissions = perms::owner_read | perms::owner_write;
+        e.hard_link_count = 1;
+        e.inode = 42;
+        e.uid = 1000;
+        e.gid = 1000;
+        e.owner = "user";
+        e.group = "staff";
+        e.mime_type = "text/plain";
+        return e;
+    }
 
 } // namespace
 

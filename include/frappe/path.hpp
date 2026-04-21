@@ -11,16 +11,16 @@
 
 namespace frappe {
 
-using path = std::filesystem::path;
-using path_view = std::string_view;
+    using path = std::filesystem::path;
+    using path_view = std::string_view;
 
-[[nodiscard]] FRAPPE_API result<path> home_path() noexcept;
-[[nodiscard]] FRAPPE_API result<path> executable_path() noexcept;
-[[nodiscard]] FRAPPE_API result<path> app_data_path() noexcept;
-[[nodiscard]] FRAPPE_API result<path> desktop_path() noexcept;
-[[nodiscard]] FRAPPE_API result<path> documents_path() noexcept;
-[[nodiscard]] FRAPPE_API result<path> downloads_path() noexcept;
-[[nodiscard]] FRAPPE_API result<path> resolve_path(const path &p) noexcept;
+    [[nodiscard]] FRAPPE_API result<path> home_path() noexcept;
+    [[nodiscard]] FRAPPE_API result<path> executable_path() noexcept;
+    [[nodiscard]] FRAPPE_API result<path> app_data_path() noexcept;
+    [[nodiscard]] FRAPPE_API result<path> desktop_path() noexcept;
+    [[nodiscard]] FRAPPE_API result<path> documents_path() noexcept;
+    [[nodiscard]] FRAPPE_API result<path> downloads_path() noexcept;
+    [[nodiscard]] FRAPPE_API result<path> resolve_path(const path &p) noexcept;
 
 } // namespace frappe
 

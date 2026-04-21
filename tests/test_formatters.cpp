@@ -7,27 +7,27 @@ using namespace frappe;
 
 namespace {
 
-file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0) {
-    file_entry e;
-    e.file_path = "/tmp/" + name;
-    e.name = name;
-    e.stem = std::filesystem::path(name).stem().string();
-    e.extension = std::filesystem::path(name).extension().string();
-    e.type = type;
-    e.size = size;
-    e.is_symlink = false;
-    e.is_broken_link = false;
-    e.has_acl = false;
-    e.has_xattr = true;
-    e.permissions = perms::owner_read | perms::owner_write | perms::group_read;
-    e.hard_link_count = 2;
-    e.inode = 12345;
-    e.uid = 1000;
-    e.gid = 1000;
-    e.owner = "alice";
-    e.group = "staff";
-    return e;
-}
+    file_entry make_entry(const std::string &name, file_type type, std::uintmax_t size = 0) {
+        file_entry e;
+        e.file_path = "/tmp/" + name;
+        e.name = name;
+        e.stem = std::filesystem::path(name).stem().string();
+        e.extension = std::filesystem::path(name).extension().string();
+        e.type = type;
+        e.size = size;
+        e.is_symlink = false;
+        e.is_broken_link = false;
+        e.has_acl = false;
+        e.has_xattr = true;
+        e.permissions = perms::owner_read | perms::owner_write | perms::group_read;
+        e.hard_link_count = 2;
+        e.inode = 12345;
+        e.uid = 1000;
+        e.gid = 1000;
+        e.owner = "alice";
+        e.group = "staff";
+        return e;
+    }
 
 } // namespace
 

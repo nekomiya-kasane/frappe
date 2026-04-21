@@ -41,9 +41,9 @@
 
 namespace rpp {
 
-// Version info
-inline constexpr int version_major = 0;
-inline constexpr int version_minor = 6;
-inline constexpr int version_patch = 0;
+    // Version info
+    inline constexpr int version_major = 0;
+    inline constexpr int version_minor = 6;
+    inline constexpr int version_patch = 0;
 
 } // namespace rpp
