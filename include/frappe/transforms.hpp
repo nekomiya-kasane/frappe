@@ -5,7 +5,9 @@
 #include "frappe/projections.hpp"
 
 #include <functional>
+#include <map>
 #include <ranges>
+#include <set>
 #include <tuple>
 #include <vector>
 

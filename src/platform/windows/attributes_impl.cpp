@@ -1,6 +1,5 @@
 #ifdef FRAPPE_PLATFORM_WINDOWS
 
-#    define NOMINMAX
 #    include "frappe/attributes.hpp"
 
 #    include <Windows.h>
