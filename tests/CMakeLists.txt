@@ -21,7 +21,6 @@ add_executable(frappe_tests
     test_projections.cpp
     test_entry.cpp
     test_formatters.cpp
-    test_rpp.cpp
 )
 
 target_link_libraries(frappe_tests

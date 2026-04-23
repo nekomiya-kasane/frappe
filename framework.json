@@ -3,5 +3,5 @@
   "type": "custom",
   "version": "0.1.0",
   "description": "Cross-platform filesystem library (shared)",
-  "dependencies": ["pcre2", "stdexec", "range_v3"]
+  "dependencies": ["rpp", "pcre2", "stdexec", "range_v3"]
 }

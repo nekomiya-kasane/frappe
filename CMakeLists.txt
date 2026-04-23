@@ -1,9 +1,9 @@
 # frappe — Cross-platform filesystem library (COCA workspace build)
 # Provides: frappe (SHARED), frappe::frappe
-# Dependencies: COCA::pcre2, COCA::stdexec, COCA::range_v3
+# Dependencies: rpp::rpp, COCA::pcre2, COCA::stdexec, COCA::range_v3
 
 # ── Guard: skip if required COCA:: deps are not available ────────────
-foreach(_dep IN ITEMS COCA::stdexec COCA::range_v3 COCA::pcre2)
+foreach(_dep IN ITEMS rpp::rpp COCA::stdexec COCA::range_v3 COCA::pcre2)
     if(NOT TARGET ${_dep})
         message(STATUS "[frappe] Skipping — ${_dep} not available")
         add_library(frappe INTERFACE)
@@ -47,26 +47,6 @@ set(FRAPPE_PUBLIC_HEADERS
     include/frappe/mmap.hpp
     include/frappe/traversal.hpp
     include/frappe/entry_adapters.hpp
-)
-
-set(RPP_PUBLIC_HEADERS
-    include/rpp/rpp.hpp
-    include/rpp/concepts.hpp
-    include/rpp/pipeable.hpp
-    include/rpp/comparator.hpp
-    include/rpp/filter.hpp
-    include/rpp/filters_ext.hpp
-    include/rpp/combine.hpp
-    include/rpp/sort.hpp
-    include/rpp/select.hpp
-    include/rpp/distinct.hpp
-    include/rpp/aggregate.hpp
-    include/rpp/aggregate_ext.hpp
-    include/rpp/transform.hpp
-    include/rpp/join.hpp
-    include/rpp/set_ops.hpp
-    include/rpp/window.hpp
-    include/rpp/extras.hpp
 )
 
 set(FRAPPE_SOURCES
@@ -141,6 +121,7 @@ target_include_directories(frappe
 
 target_link_libraries(frappe
     PUBLIC
+        rpp::rpp
         COCA::stdexec
         COCA::range_v3
     PRIVATE
